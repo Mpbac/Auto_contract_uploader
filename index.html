@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Contract Documents</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+  <style>
+    :root {
+      --custom-primary-color: #00693e; /* Example: Dartmouth Green */
+      --custom-light-bg: #f8f8f8;
+    }
+    body {
+      background-color: var(--custom-light-bg);
+      padding-top: 0; /* Remove default padding if hero is full width */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .form-upload-container {
+      max-width: 600px;
+      width: 100%;
+      margin: 30px auto; /* Added margin for spacing from hero */
+      background-color: white;
+      padding: 30px 40px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+    }
+    .hero.is-primary-custom { /* Custom hero class */
+      background-color: var(--custom-primary-color);
+      width: 100%; /* Make hero full width */
+    }
+    .hero-body .container .title {
+      color: white;
+      font-size: 2.2em;
+    }
+    .file-upload-area {
+      margin-bottom: 25px;
+    }
+    #fileNameDisplay {
+        margin-top: 10px;
+        font-style: italic;
+        display: block; /* Ensure it takes its own line */
+        padding: 0.5em;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+        background-color: #fff;
+    }
+    #messageArea {
+        margin-top: 20px;
+        font-weight: bold;
+    }
+    .button.is-primary-custom {
+      background-color: var(--custom-primary-color);
+      color: white;
+      font-weight: bold;
+    }
+    .button.is-primary-custom:hover {
+      background-color: #005a34; /* Darker shade of primary */
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero is-primary-custom is-bold">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title">Contract Document Upload Portal</h1>
+      </div>
+    </div>
+  </section>
+
+  <div class="form-upload-container">
+    <h2 class="title is-4 has-text-centered">Upload Your Contract</h2>
+    <p class="subtitle is-6 has-text-centered">Please select a PDF or PNG file of your contract to upload.</p>
+
+    <form id="uploadForm">
+      <div class="field file-upload-area">
+        <label class="label">Contract File (PDF or PNG accepted)</label>
+        <div class="control">
+          <div class="file is-boxed is-fullwidth has-name">
+            <label class="file-label">
+              <input class="file-input" type="file" name="contractFile" id="contractFile" accept=".pdf,.png,application/pdf,image/png" required>
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i> </span>
+                <span class="file-label">
+                  Choose file…
+                </span>
+              </span>
+              <span class="file-name" id="fileNameDisplay">
+                No file selected.
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitButton">
+            <span class="icon is-small"><i class="fas fa-cloud-upload-alt"></i></span>
+            <span>Upload Selected File</span>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div id="messageArea" class="content">
+      </div>
+  </div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    const contractFileInput = document.getElementById('contractFile');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const messageArea = document.getElementById('messageArea');
+    const submitButton = document.getElementById('submitButton');
+
+    // !!! IMPORTANT: REPLACE THIS URL WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL AFTER DEPLOYMENT !!!
+    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    contractFileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        const file = this.files[0];
+        fileNameDisplay.textContent = file.name;
+        messageArea.innerHTML = ''; // Clear previous messages
+        messageArea.className = 'content'; // Reset class
+
+        // Client-side validation
+        const allowedMimeTypes = ['application/pdf', 'image/png'];
+        const allowedExtensions = /(\.pdf|\.png)$/i;
+
+        if (!allowedMimeTypes.includes(file.type) || !allowedExtensions.exec(file.name)) {
+          messageArea.innerHTML = '<div class="notification is-danger">Error: Invalid file type. Only PDF and PNG files are accepted.</div>';
+          this.value = ''; // Reset file input
+          fileNameDisplay.textContent = 'No file selected.';
+          return;
+        }
+
+        const maxSizeInBytes = 10 * 1024 * 1024; // 10MB limit
+        if (file.size > maxSizeInBytes) {
+          messageArea.innerHTML = `<div class="notification is-danger">Error: File is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB.</div>`;
+          this.value = ''; // Reset file input
+          fileNameDisplay.textContent = 'No file selected.';
+          return;
+        }
+      } else {
+        fileNameDisplay.textContent = 'No file selected.';
+      }
+    });
+
+    uploadForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+        messageArea.innerHTML = '<div class="notification is-danger">Error: Backend script URL is not configured. Please contact support.</div>';
+        return;
+      }
+
+      if (contractFileInput.files.length === 0) {
+        messageArea.innerHTML = '<div class="notification is-warning">Please select a file to upload.</div>';
+        return;
+      }
+
+      const file = contractFileInput.files[0];
+
+      // Re-validate before sending
+      const allowedMimeTypes = ['application/pdf', 'image/png'];
+      const allowedExtensions = /(\.pdf|\.png)$/i;
+      if (!allowedMimeTypes.includes(file.type) || !allowedExtensions.exec(file.name)) {
+        messageArea.innerHTML = '<div class="notification is-danger">Error: Invalid file type. Please upload a PDF or PNG.</div>';
+        return;
+      }
+      const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSizeInBytes) {
+          messageArea.innerHTML = `<div class="notification is-danger">Error: File is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB.</div>`;
+          return;
+        }
+
+      submitButton.classList.add('is-loading');
+      messageArea.innerHTML = '<div class="notification is-info">Uploading, please wait...</div>';
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file); // Reads file as Base64
+
+      reader.onloadend = function() {
+        const base64data = reader.result;
+
+        const payload = {
+          filename: file.name,
+          mimeType: file.type,
+          fileData: base64data.split(',')[1] // Remove the "data:mime/type;base64," part
+        };
+
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json', // Sending a JSON payload
+          },
+          body: JSON.stringify(payload),
+          // redirect: 'follow' // By default, fetch handles redirects for Apps Script web apps
+        })
+        .then(response => {
+            // Check if response is ok, then try to parse as JSON
+            if (!response.ok) {
+                // If response not ok, try to get text for error message
+                return response.text().then(text => {
+                    throw new Error(`Server responded with ${response.status}: ${text || 'Unknown server error'}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+          if (data.status === 'success') {
+            messageArea.innerHTML = `<div class="notification is-success">${data.message || 'File uploaded successfully!'}</div>`;
+            uploadForm.reset();
+            fileNameDisplay.textContent = 'No file selected.';
+          } else {
+            messageArea.innerHTML = `<div class="notification is-danger">Error: ${data.message || 'Unknown error during upload.'}</div>`;
+          }
+        })
+        .catch(error => {
+          console.error('Upload Error:', error);
+          messageArea.innerHTML = `<div class="notification is-danger">Upload failed: ${error.message}. Check the console for more details.</div>`;
+        })
+        .finally(() => {
+          submitButton.classList.remove('is-loading');
+        });
+      };
+
+      reader.onerror = function() {
+        console.error('File reading error');
+        messageArea.innerHTML = '<div class="notification is-danger">Error reading the file. Please try again.</div>';
+        submitButton.classList.remove('is-loading');
+      };
+    });
+  </script>
+</body>
+</html>
