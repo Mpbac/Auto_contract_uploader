@@ -34,12 +34,11 @@
       width: 100%; /* Make hero full width */
     }
 
-    /* --- Copied styles from Car Buying Study HTML for banner layout --- */
+    /* Copied styles from Car Buying Study HTML for banner layout */
     .hero-body .container {
       display: flex;
       align-items: center;
       justify-content: center;
-      /* Removed Bulma columns and the old centering class */
     }
 
     .hero .title {
@@ -53,9 +52,8 @@
     .banner-logo {
       max-height: 70px; /* Adjust size as needed */
       width: auto;
-      /* Removed old logo/column specific styles */
     }
-    /* --- End copied styles --- */
+    /* End copied styles */
 
 
     .file-upload-area {
@@ -105,7 +103,7 @@
   <section class="hero is-primary-custom is-bold">
     <div class="hero-body">
       <div class="container">
-        <img src="D-Pine_Rev.png" alt="Dartmouth Logo" class="banner-logo">
+        <img src="YOUR_DARTMOUTH_LOGO_IMAGE_URL.png" alt="Dartmouth Logo" class="banner-logo">
         <h1 class="title">Contract Document Upload Portal</h1>
       </div>
       </div>
@@ -114,15 +112,15 @@
 
   <div class="form-upload-container">
     <h2 class="title is-4 has-text-centered">Upload Your Contract</h2>
-    <p class="subtitle is-6 has-text-centered">Please select a PDF or PNG file of your contract to upload.</p>
+    <p class="subtitle is-6 has-text-centered">Please select a PDF, PNG, JPG, or HEIC file of your contract to upload.</p>
 
     <form id="uploadForm" method="post" action="">
         <div class="field file-upload-area">
-          <label class="label">Contract File (PDF or PNG accepted)</label>
+          <label class="label">Contract File (PDF, PNG, JPG, or HEIC accepted)</label>
           <div class="control">
             <div class="file is-boxed is-fullwidth has-name">
               <label class="file-label">
-                <input class="file-input" type="file" id="contractFile" accept=".pdf,.png,application/pdf,image/png" required>
+                <input class="file-input" type="file" id="contractFile" accept=".pdf,.png,.jpg,.jpeg,.heic,.heif,application/pdf,image/png,image/jpeg,image/heic,image/heif" required>
                 <span class="file-cta">
                   <span class="file-icon">
                     <i class="fas fa-upload"></i> </span>
@@ -179,19 +177,23 @@
           messageArea.removeClass('is-danger is-success is-warning is-info'); // Remove Bulma notification classes
 
 
-          // Client-side validation
-          const allowedMimeTypes = ['application/pdf', 'image/png'];
-          const allowedExtensions = /\.(pdf|png)$/i;
+          // --- Modified Client-side validation ---
+          // Added support for image/jpeg, image/heic, image/heif
+          const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/heic', 'image/heif'];
+          // Added support for .jpg, .jpeg, .heic, .heif extensions
+          const allowedExtensions = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
 
           // Use file.type for client-side validation MIME check
           if (!allowedMimeTypes.includes(file.type) || !allowedExtensions.test(file.name)) {
-            messageArea.html('<div class="notification is-danger">Error: Invalid file type. Only PDF and PNG files are accepted.</div>');
+            messageArea.html('<div class="notification is-danger">Error: Invalid file type. Only PDF, PNG, JPG, and HEIC files are accepted.</div>');
             messageArea.addClass('is-danger');
             this.value = ''; // Reset file input
             fileNameDisplay.text('No file selected.');
             fileDataInputs.empty(); // Clear hidden inputs if file is invalid
             return;
           }
+          // --- End Modified Client-side validation ---
+
 
           const maxSizeInBytes = 10 * 1024 * 1024; // 10MB limit
           if (file.size > maxSizeInBytes) {
@@ -270,9 +272,9 @@
           success: function(data) {
             // data is the JSON object returned by the Apps Script
             if (data && data.status === 'success') {
-              // --- MODIFIED: Simplified Success Message ---
+              // --- Simplified Success Message ---
               messageArea.html('<div class="notification is-success">Successfully submitted.</div>');
-              // --- END MODIFIED ---
+              // --- END Simplified Success Message ---
               messageArea.addClass('is-success');
               uploadForm[0].reset(); // Reset the form
               fileNameDisplay.text('No file selected.');
