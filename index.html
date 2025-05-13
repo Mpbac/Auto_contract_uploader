@@ -33,23 +33,31 @@
       background-color: var(--custom-primary-color);
       width: 100%; /* Make hero full width */
     }
-    /* Modified hero-body container to use columns */
+
+    /* --- Copied styles from Car Buying Study HTML for banner layout --- */
     .hero-body .container {
-       /* Removed has-text-centered */
-       /* Bulma columns will handle layout */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Removed Bulma columns and the old centering class */
     }
-     /* Style the logo within the banner */
-    .hero-body .logo-column img {
-        max-height: 60px; /* Adjust logo size to fit well in the banner */
-        height: auto;
-        padding-right: 20px; /* Add some space to the right of the logo */
-        vertical-align: middle; /* Align vertically with text if needed */
-    }
-    .hero-body .container .title {
+
+    .hero .title {
       color: white;
-      font-size: 2.2em;
-      /* Keep text centered within its column */
+      font-size: 2.2em; /* Retained size from your upload form */
+      font-weight: 600;
+      margin-left: 1.5rem; /* Space between logo and title */
+      margin-bottom: 0; /* Remove default title margin */
     }
+
+    .banner-logo {
+      max-height: 70px; /* Adjust size as needed */
+      width: auto;
+      /* Removed old logo/column specific styles */
+    }
+    /* --- End copied styles --- */
+
+
     .file-upload-area {
       margin-bottom: 25px;
     }
@@ -82,12 +90,12 @@
         padding: 20px;
         margin: 20px auto;
       }
-      .hero-body .logo-column img {
-            max-height: 40px; /* Make logo smaller on small screens */
-            padding-right: 10px;
+      /* Adjust logo size on small screens */
+      .banner-logo {
+            max-height: 50px; /* Smaller logo on small screens */
         }
-       .hero-body .container .title {
-            font-size: 1.8em;
+        .hero .title {
+             font-size: 1.8em; /* Smaller title on small screens */
         }
     }
   </style>
@@ -97,17 +105,12 @@
   <section class="hero is-primary-custom is-bold">
     <div class="hero-body">
       <div class="container">
-        <div class="columns is-vcentered">
-          <div class="column is-narrow logo-column">
-             <img src="D-Pine_Rev.png" alt="Dartmouth Logo">
-          </div>
-          <div class="column title-column">
-            <h1 class="title has-text-centered">Contract Document Upload Portal</h1>
-          </div>
-           </div>
+        <img src="D-Pine_Rev.png" alt="Dartmouth Logo" class="banner-logo">
+        <h1 class="title">Contract Document Upload Portal</h1>
       </div>
       </div>
   </section>
+
 
   <div class="form-upload-container">
     <h2 class="title is-4 has-text-centered">Upload Your Contract</h2>
