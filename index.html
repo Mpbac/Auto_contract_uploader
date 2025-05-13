@@ -37,6 +37,16 @@
       color: white;
       font-size: 2.2em;
     }
+    /* Added styling for the logo container and image */
+    .logo-container {
+        text-align: center; /* Center the image inside */
+        margin-top: 30px; /* Space above the form */
+        margin-bottom: 20px; /* Space below the logo */
+    }
+    .logo-container img {
+        max-width: 200px; /* Control the maximum width of the logo */
+        height: auto; /* Maintain aspect ratio */
+    }
     .file-upload-area {
       margin-bottom: 25px;
     }
@@ -69,6 +79,9 @@
         padding: 20px;
         margin: 20px auto;
       }
+       .logo-container img {
+            max-width: 150px; /* Make logo smaller on small screens */
+        }
     }
   </style>
 </head>
@@ -82,6 +95,9 @@
     </div>
   </section>
 
+  <div class="logo-container">
+      <img src="D-Pine_Rev.png" alt="Dartmouth Logo">
+  </div>
   <div class="form-upload-container">
     <h2 class="title is-4 has-text-centered">Upload Your Contract</h2>
     <p class="subtitle is-6 has-text-centered">Please select a PDF or PNG file of your contract to upload.</p>
@@ -125,7 +141,7 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script>
+  <script>
     $(document).ready(function() {
       const uploadForm = $('#uploadForm');
       const contractFileInput = $('#contractFile');
