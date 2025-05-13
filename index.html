@@ -33,19 +33,22 @@
       background-color: var(--custom-primary-color);
       width: 100%; /* Make hero full width */
     }
+    /* Modified hero-body container to use columns */
+    .hero-body .container {
+       /* Removed has-text-centered */
+       /* Bulma columns will handle layout */
+    }
+     /* Style the logo within the banner */
+    .hero-body .logo-column img {
+        max-height: 60px; /* Adjust logo size to fit well in the banner */
+        height: auto;
+        padding-right: 20px; /* Add some space to the right of the logo */
+        vertical-align: middle; /* Align vertically with text if needed */
+    }
     .hero-body .container .title {
       color: white;
       font-size: 2.2em;
-    }
-    /* Added styling for the logo container and image */
-    .logo-container {
-        text-align: center; /* Center the image inside */
-        margin-top: 30px; /* Space above the form */
-        margin-bottom: 20px; /* Space below the logo */
-    }
-    .logo-container img {
-        max-width: 200px; /* Control the maximum width of the logo */
-        height: auto; /* Maintain aspect ratio */
+      /* Keep text centered within its column */
     }
     .file-upload-area {
       margin-bottom: 25px;
@@ -79,8 +82,12 @@
         padding: 20px;
         margin: 20px auto;
       }
-       .logo-container img {
-            max-width: 150px; /* Make logo smaller on small screens */
+      .hero-body .logo-column img {
+            max-height: 40px; /* Make logo smaller on small screens */
+            padding-right: 10px;
+        }
+       .hero-body .container .title {
+            font-size: 1.8em;
         }
     }
   </style>
@@ -89,15 +96,19 @@
 
   <section class="hero is-primary-custom is-bold">
     <div class="hero-body">
-      <div class="container has-text-centered">
-        <h1 class="title">Contract Document Upload Portal</h1>
+      <div class="container">
+        <div class="columns is-vcentered">
+          <div class="column is-narrow logo-column">
+             <img src="D-Pine_Rev.png" alt="Dartmouth Logo">
+          </div>
+          <div class="column title-column">
+            <h1 class="title has-text-centered">Contract Document Upload Portal</h1>
+          </div>
+           </div>
       </div>
-    </div>
+      </div>
   </section>
 
-  <div class="logo-container">
-      <img src="D-Pine_Rev.png" alt="Dartmouth Logo">
-  </div>
   <div class="form-upload-container">
     <h2 class="title is-4 has-text-centered">Upload Your Contract</h2>
     <p class="subtitle is-6 has-text-centered">Please select a PDF or PNG file of your contract to upload.</p>
