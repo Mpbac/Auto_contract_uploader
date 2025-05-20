@@ -57,16 +57,48 @@
       margin-bottom: 25px;
     }
 
-    #fileNameDisplay { /* Only main file display needs this ID now */
+    /* Updated styling for the file list display */
+    #selectedFilesList {
         margin-top: 10px;
-        font-style: italic;
-        display: block;
-        padding: 0.5em;
         border: 1px solid #dbdbdb;
         border-radius: 4px;
         background-color: #fff;
-        word-wrap: break-word; /* Prevent long file names from overflowing */
+        padding: 10px;
+        min-height: 40px; /* Ensure it's visible even if empty */
+        box-sizing: border-box;
     }
+
+    .selected-file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px dashed #eee;
+        font-size: 0.9em;
+        color: #4a4a4a;
+    }
+    .selected-file-item:last-child {
+        border-bottom: none;
+    }
+    .selected-file-item .file-name-text {
+        flex-grow: 1;
+        word-break: break-all; /* Ensure long filenames wrap */
+        margin-right: 10px;
+    }
+    .selected-file-item .delete-file {
+        background: none;
+        border: none;
+        color: #ff3860; /* Bulma danger color */
+        cursor: pointer;
+        font-size: 1.1em;
+        padding: 0 5px;
+        line-height: 1;
+        transition: color 0.2s ease;
+    }
+    .selected-file-item .delete-file:hover {
+        color: #b71c1c;
+    }
+
 
     #messageArea {
         margin-top: 20px;
@@ -92,6 +124,12 @@
         text-align: center; /* Center the button */
     }
 
+    .file-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
 
     @media (max-width: 768px) {
       .form-upload-container {
@@ -102,10 +140,10 @@
             max-height: 50px;
         }
         .hero .title {
-             font-size: 1.8em;
-             margin-left: 1rem; /* Adjusted for smaller screens */
+            font-size: 1.8em;
+            margin-left: 1rem; /* Adjusted for smaller screens */
         }
-         .hero-body .container {
+        .hero-body .container {
             flex-direction: column; /* Stack logo and title on small screens */
             text-align: center;
         }
@@ -133,20 +171,21 @@
     <h2 class="title is-4 has-text-centered">Upload Your Contract Document(s)</h2>
     <p class="subtitle is-6 has-text-centered">Please provide your email and select one or more files to upload.</p>
 
-     <div class="content" style="margin-bottom: 25px;">
-        <p><strong>Please upload your final, contract document(s).</strong></p>
+      <div class="content" style="margin-bottom: 25px;">
+        <p><strong>Please upload your final, signed contract document(s).</strong></p>
         <ul>
             <li>For **pictures** (JPG, PNG, HEIC), ensure they are **clear, readable, well-lit**, and show the **full page** without cut-offs.</li>
+            <li>You can **take multiple photos directly from your mobile device** if your contract is in separate pages or images.</li>
             <li>Please include pages showing **key terms, vehicle details, and financing information**.</li>
             <li>You may select **multiple files** at once if your contract is in separate files or images.</li>
         </ul>
     </div>
 
     <div class="example-button-container">
-         <p class="is-size-7" style="margin-bottom: 10px;">Click below to see an example of pages to include:</p>
-         <button type="button" class="button is-link is-small" id="viewExampleButton">
+          <p class="is-size-7" style="margin-bottom: 10px;">Click below to see an example of pages to include:</p>
+          <button type="button" class="button is-link is-small" id="viewExampleButton">
             View Example Page
-        </button>
+          </button>
     </div>
     <form id="uploadForm">
         <div class="field">
@@ -161,7 +200,7 @@
           <div class="control">
             <div class="file is-boxed is-fullwidth has-name">
               <label class="file-label">
-                <input class="file-input" type="file" id="contractFile" name="contractFiles[]" accept=".pdf,.png,.jpg,.jpeg,.heic,.heif,application/pdf,image/png,image/jpeg,image/heic,image/heif" multiple required>
+                <input class="file-input" type="file" id="contractFile" name="contractFiles[]" accept=".pdf,.png,.jpg,.jpeg,.heic,.heif,application/pdf,image/png,image/jpeg,image/heic,image/heif" multiple required capture="camera">
                 <span class="file-cta">
                   <span class="file-icon">
                     <i class="fas fa-upload"></i>
@@ -170,11 +209,17 @@
                     Choose file(s)…
                   </span>
                 </span>
-                <span class="file-name" id="fileNameDisplay">
-                  No file(s) selected.
-                </span>
-              </label>
+                </label>
             </div>
+          </div>
+          <div id="selectedFilesList">
+            <p class="has-text-grey-light">No file(s) selected.</p>
+          </div>
+          <div class="file-actions">
+            <button type="button" class="button is-danger is-small is-light" id="clearAllFilesButton" style="display: none;">
+                <span class="icon is-small"><i class="fas fa-times"></i></span>
+                <span>Clear All Files</span>
+            </button>
           </div>
         </div>
 
@@ -205,91 +250,124 @@
   <script>
     $(document).ready(function() {
       const uploadForm = $('#uploadForm');
-      const emailInput = $('#emailInput'); // Get reference to email input
-      const contractFileInput = $('#contractFile'); // Main contract files
-      const fileNameDisplay = $('#fileNameDisplay'); // Main file display
+      const emailInput = $('#emailInput');
+      const contractFileInput = $('#contractFile');
+      const selectedFilesList = $('#selectedFilesList'); // Updated: now a container for the list
+      const clearAllFilesButton = $('#clearAllFilesButton'); // New button
       const messageArea = $('#messageArea');
       const submitButton = $('#submitButton');
 
-      // Get references for the modal and its trigger/close elements
       const exampleModal = $('#exampleModal');
       const viewExampleButton = $('#viewExampleButton');
       const modalBackground = $('.modal-background');
       const modalCloseButton = $('.modal-close');
 
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-qi89_2nktIW--lThd4FjZ9Egp9EXP0RxX2nTrLQp1ROuOgX1Qwgx5fTb70TV8jKCUA/exec"; // REPLACE ME
 
-      // !! IMPORTANT !!
-      // REPLACE THIS WITH the Web App URL from your Apps Script deployment ("Execute as: Me", "Who has access: Anyone, even anonymous")
-      // Use the URL from the DEPLOYMENT of your working Script (the one updated to handle form-urlencoded)
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-qi89_2nktIW--lThd4FjZ9Egp9EXP0RxX2nTrLQp1ROuOgX1Qwgx5fTb70TV8jKCUA/exec"; // Example URL - REPLACE ME
+      // Use a Map to store files, using a unique key (e.g., file.name + file.size + file.lastModified)
+      // This helps in managing individual files and avoids issues with duplicate names if sizes/dates differ.
+      let filesToUpload = new Map();
 
 
-      let filesToUpload = []; // Array to hold valid main contract File objects
+      // Function to render the list of selected files
+      function renderSelectedFiles() {
+          selectedFilesList.empty(); // Clear current display
+
+          if (filesToUpload.size === 0) {
+              selectedFilesList.append('<p class="has-text-grey-light">No file(s) selected.</p>');
+              clearAllFilesButton.hide();
+          } else {
+              clearAllFilesButton.show();
+              filesToUpload.forEach((file, key) => {
+                  const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                  const fileItem = `
+                      <div class="selected-file-item">
+                          <span class="file-name-text">${file.name} (${fileSizeMB} MB)</span>
+                          <button type="button" class="delete-file" data-key="${key}" title="Remove file">
+                              <i class="fas fa-times-circle"></i>
+                          </button>
+                      </div>
+                  `;
+                  selectedFilesList.append(fileItem);
+              });
+          }
+      }
+
+      // Event listener for removing individual files
+      selectedFilesList.on('click', '.delete-file', function() {
+          const keyToRemove = $(this).data('key');
+          filesToUpload.delete(keyToRemove);
+          renderSelectedFiles(); // Re-render the list
+          messageArea.html(''); // Clear any previous messages
+          messageArea.removeClass('is-danger is-success is-warning is-info');
+          // Important: If the file input had a value, it's now out of sync.
+          // For simplicity, we don't try to sync it back, but rely on filesToUpload Map.
+      });
+
+      // Event listener for clearing all files
+      clearAllFilesButton.on('click', function() {
+          filesToUpload.clear();
+          contractFileInput.val(''); // Clear the file input element's value
+          renderSelectedFiles();
+          messageArea.html(''); // Clear any previous messages
+          messageArea.removeClass('is-danger is-success is-warning is-info');
+      });
 
 
       // Event listener for the main contract file input
       contractFileInput.on('change', function() {
-          console.log('Main contract file input changed. Selected files:', this.files.length);
-          filesToUpload = []; // Clear previous selection
+          console.log('Main contract file input changed. New files selected:', this.files.length);
           // Don't clear messageArea here, only on form submit
 
           if (this.files.length > 0) {
-              let allFilesValid = true;
-              const fileNames = [];
-              const currentFiles = Array.from(this.files);
+              let allNewFilesValid = true;
+              const newFiles = Array.from(this.files);
 
-              const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/heic', 'image/heif'];
+              const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'image/heic', 'image/heif'];
               const allowedExtensionsRegex = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
               const maxSizeInBytes = 10 * 1024 * 1024; // 10MB limit per file
 
-              for (const file of currentFiles) {
-                  fileNames.push(file.name);
+              for (const file of newFiles) {
+                  // Create a unique key for the file to store in the Map
+                  const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
 
                   // Validate MIME type and extension
                   if (!allowedMimeTypes.includes(file.type) && !allowedExtensionsRegex.test(file.name)) {
-                      messageArea.html(`<div class="notification is-danger">Error in main files: Invalid file type for "${file.name}". Only PDF, PNG, JPG, and HEIC files are accepted.</div>`);
-                       messageArea.addClass('is-danger'); // Add class on error
-                      allFilesValid = false;
-                      break; // Stop checking further files on first error
+                      messageArea.html(`<div class="notification is-danger">Error: Invalid file type for "${file.name}". Only PDF, PNG, JPG, and HEIC files are accepted.</div>`);
+                      messageArea.addClass('is-danger');
+                      allNewFilesValid = false;
+                      break;
                   }
 
                   // Validate file size
                   if (file.size > maxSizeInBytes) {
-                      messageArea.html(`<div class="notification is-danger">Error in main files: File "${file.name}" is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB per file.</div>`);
-                       messageArea.addClass('is-danger'); // Add class on error
-                      allFilesValid = false;
-                      break; // Stop checking further files on first error
+                      messageArea.html(`<div class="notification is-danger">Error: File "${file.name}" is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB per file.</div>`);
+                      messageArea.addClass('is-danger');
+                      allNewFilesValid = false;
+                      break;
                   }
+
+                  // If valid, add to the Map (will overwrite if same key, which is fine for re-selecting same file)
+                  filesToUpload.set(fileKey, file);
               }
 
-              if (allFilesValid) {
-                  // Truncate long file name list for display
-                  const displayLimit = 3; // Show first 3 file names
-                  const displayNames = fileNames.slice(0, displayLimit).join(', ');
-                  const remainingCount = fileNames.length - displayLimit;
-                  const displayText = remainingCount > 0
-                      ? `${fileNames.length} file(s) selected: ${displayNames}... (+${remainingCount} more)`
-                      : `${fileNames.length} file(s) selected: ${fileNames.join(', ')}`;
-
-                  fileNameDisplay.text(displayText);
-                  filesToUpload = currentFiles; // Store valid main files
-                  // Clear previous file error messages if valid
-                  messageArea.html('');
+              if (allNewFilesValid) {
+                  renderSelectedFiles(); // Re-render the list with all accumulated files
+                  messageArea.html(''); // Clear previous error messages if new files are valid
                   messageArea.removeClass('is-danger');
-
               } else {
-                  // Clear selection if validation failed
-                  this.value = '';
-                  fileNameDisplay.text('No file(s) selected.');
-                  filesToUpload = [];
-                   messageArea.addClass('is-danger'); // Ensure error class is added
+                  // If any new file is invalid, clear the input value but keep previously valid files
+                  this.value = ''; // Clear the input so user can re-select
+                  // The invalid file(s) are not added to filesToUpload, so no need to remove them.
+                  // The error message for the invalid file is already set.
               }
 
           } else {
-              fileNameDisplay.text('No file(s) selected.');
-              filesToUpload = [];
-               messageArea.html(''); // Clear messages if user clears selection
-               messageArea.removeClass('is-danger is-success is-warning is-info');
+              // If the user opened the picker but selected no new files (or cancelled)
+              // We don't clear filesToUpload here. They might just be closing the picker.
+              // The renderSelectedFiles() will still show existing files.
+              messageArea.html('');
+              messageArea.removeClass('is-danger is-success is-warning is-info');
           }
       });
 
@@ -297,24 +375,22 @@
       uploadForm.on('submit', function(event) {
         event.preventDefault();
 
-        const emailAddress = emailInput.val().trim(); // Get email and trim whitespace
+        const emailAddress = emailInput.val().trim();
 
         // --- Frontend Validation Checks ---
-        // Basic email format validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailAddress || !emailRegex.test(emailAddress)) {
-             messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
-             messageArea.addClass('is-warning');
-             emailInput.focus();
-             return;
+            messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
+            messageArea.addClass('is-warning');
+            emailInput.focus();
+            return;
         }
 
-        // Ensure at least one main contract file is selected
-        if (filesToUpload.length === 0) {
-             messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
-             messageArea.addClass('is-warning');
-             contractFileInput.focus(); // Focus the main file input
-             return;
+        if (filesToUpload.size === 0) { // Check the Map size
+            messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
+            messageArea.addClass('is-warning');
+            contractFileInput.focus();
+            return;
         }
         // --- End Frontend Validation Checks ---
 
@@ -324,33 +400,24 @@
         messageArea.addClass('is-info');
 
 
-        // --- Prepare Data for AJAX as a JavaScript Object (jQuery will serialize as form-urlencoded) ---
-        // The structure will include the email, the main files array.
         const postData = {
-            emailAddress: emailAddress, // Include email in the payload
+            emailAddress: emailAddress,
             files: [] // Array to hold main contract file data objects
-            // Optional financing file data is NOT included in this form submission based on your clarification
         };
 
-        // Only read the main contract files for upload
-        const filesToRead = [...filesToUpload];
-
-
+        const filesToRead = Array.from(filesToUpload.values()); // Get all File objects from the Map
         let filesReadCount = 0;
-        const totalFilesToRead = filesToRead.length; // Total number of files to read
+        const totalFilesToRead = filesToRead.length;
 
         const readPromises = filesToRead.map(file => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
-                       // Extract base64 string after comma
                        const base64Data = e.target.result.split(',')[1];
-                       // Default if type is empty
                        const mimeType = file.type || 'application/octet-stream';
                        const filename = file.name;
 
-                       // Add file data as an object to the 'files' array in the postData
                        postData.files.push({
                            data: base64Data,
                            mimetype: mimeType,
@@ -358,12 +425,8 @@
                        });
                        console.log(`Finished reading contract file: "${filename}"`);
 
-
                        filesReadCount++;
-                       // Optional: Update progress message as files are read
-                       // messageArea.html(`<div class="notification is-info">Reading files: ${filesReadCount} of ${totalFilesToRead}...</div>`);
-
-                       resolve(); // Resolve the promise when reading is complete
+                       resolve();
                     } catch (err) {
                        console.error('FileReader processing error for file:', file.name, err);
                        reject(`Error processing file "${file.name}": ${err.message}`);
@@ -374,96 +437,85 @@
                     reject(`Failed to read file "${file.name}".`);
                 };
                 console.log(`Starting FileReader for file: "${file.name}"`);
-                reader.readAsDataURL(file); // Read the file content as a Data URL (Base64)
+                reader.readAsDataURL(file);
             });
         });
 
         console.log('Starting Promise.all to read files...');
 
-        // Wait for all files (main contract files) to be read before sending
         Promise.all(readPromises)
             .then(() => {
-                 // --- All files read successfully, now send AJAX request ---
-                 console.log('Promise.all resolved (all files read).');
-                 // Log the structure of the object *before* jQuery serializes it
-                 console.log('Object payload before AJAX send (form-urlencoded):', postData);
+                    console.log('Promise.all resolved (all files read).');
+                    console.log('Object payload before AJAX send (form-urlencoded):', postData);
 
-                 messageArea.html(`<div class="notification is-info">All files read. Sending ${totalFilesToRead} file(s)...</div>`);
+                    messageArea.html(`<div class="notification is-info">All files read. Sending ${totalFilesToRead} file(s)...</div>`);
 
-                 $.ajax({
-                    url: GOOGLE_SCRIPT_URL, // Use the defined script URL
-                    type: 'POST', // Use POST method
-                    data: postData, // Send the data as the plain object (jQuery will serialize as form-urlencoded)
-                    // REMOVED: contentType: 'application/json', <-- jQuery will default to application/x-www-form-urlencoded
-                    dataType: 'json', // Expect a JSON response from the server
-                    timeout: 300000, // Add a timeout (e.g., 5 minutes = 300000ms)
-                    success: function(data) {
-                        console.log('AJAX success response:', data);
-                        // Check the status in the JSON response from the script
-                        if (data && data.status === 'success') {
-                            messageArea.html('<div class="notification is-success">Successfully submitted. Your files have been uploaded.</div>');
-                            messageArea.addClass('is-success');
-                            uploadForm[0].reset(); // Reset the form
-                            fileNameDisplay.text('No file(s) selected.');
-                            filesToUpload = []; // Clear the stored main files
-                        } else {
-                            // Handle errors reported by the script (status is not 'success')
-                            messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
-                            messageArea.addClass('is-danger');
-                            console.error('Upload Error Response from server:', data);
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                         console.error('AJAX Error:', textStatus, errorThrown, jqXHR);
-                         let errorMessage = 'Upload failed.';
+                    $.ajax({
+                        url: GOOGLE_SCRIPT_URL,
+                        type: 'POST',
+                        data: postData,
+                        dataType: 'json',
+                        timeout: 300000, // 5 minutes
+                        success: function(data) {
+                            console.log('AJAX success response:', data);
+                            if (data && data.status === 'success') {
+                                messageArea.html('<div class="notification is-success">Successfully submitted. Your files have been uploaded.</div>');
+                                messageArea.addClass('is-success');
+                                uploadForm[0].reset();
+                                filesToUpload.clear(); // Clear the Map
+                                renderSelectedFiles(); // Update display
+                            } else {
+                                messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
+                                messageArea.addClass('is-danger');
+                                console.error('Upload Error Response from server:', data);
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error('AJAX Error:', textStatus, errorThrown, jqXHR);
+                            let errorMessage = 'Upload failed.';
 
-                         if (textStatus === 'timeout') {
-                             errorMessage += ' The request timed out.';
-                         } else if (jqXHR.status === 0) {
-                              errorMessage += ' Network error or server did not respond.';
-                         } else if (jqXHR.status === 404) {
-                              errorMessage += ' Server not found. Check the script URL.';
-                         } else if (jqXHR.status >= 500) { // Catch 5xx server errors
-                              errorMessage += ' Server error. Check the Apps Script execution logs.';
-                         } else if (errorThrown === 'parsererror') {
-                             errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
-                         }
-                          else {
-                           errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
-                         }
-
-                         // Attempt to get more details from the server response if available
-                         if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                             errorMessage += ' Details: ' + jqXHR.responseJSON.message;
-                         } else if (jqXHR.responseText) {
-                             try {
-                                 const responseJson = JSON.parse(jqXHR.responseText);
-                                 if(responseJson.message) {
-                                    errorMessage += ' Details: ' + responseJson.message;
-                                 } else {
-                                    // Avoid logging massive responses
-                                    const snippet = jqXHR.responseText.substring(0, 200);
-                                    errorMessage += ' Server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
-                                 }
-                             } catch (e) {
-                                 // If responseText isn't JSON, include a snippet
-                                  const snippet = jqXHR.responseText.substring(0, 200);
-                                  errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                            if (textStatus === 'timeout') {
+                                errorMessage += ' The request timed out.';
+                            } else if (jqXHR.status === 0) {
+                                 errorMessage += ' Network error or server did not respond.';
+                            } else if (jqXHR.status === 404) {
+                                 errorMessage += ' Server not found. Check the script URL.';
+                            } else if (jqXHR.status >= 500) {
+                                 errorMessage += ' Server error. Check the Apps Script execution logs.';
+                            } else if (errorThrown === 'parsererror') {
+                                 errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
+                            }
+                             else {
+                                errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
                              }
-                         }
 
+                             if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                                 errorMessage += ' Details: ' + jqXHR.responseJSON.message;
+                             } else if (jqXHR.responseText) {
+                                 try {
+                                     const responseJson = JSON.parse(jqXHR.responseText);
+                                     if(responseJson.message) {
+                                         errorMessage += ' Details: ' + responseJson.message;
+                                     } else {
+                                         const snippet = jqXHR.responseText.substring(0, 200);
+                                         errorMessage += ' Server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                     }
+                                 } catch (e) {
+                                     const snippet = jqXHR.responseText.substring(0, 200);
+                                     errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                 }
+                             }
 
-                         messageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
-                         messageArea.addClass('is-danger');
-                       },
-                    complete: function() {
-                        console.log('AJAX complete.');
-                        submitButton.removeClass('is-loading');
-                    }
-                });
+                            messageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
+                            messageArea.addClass('is-danger');
+                        },
+                        complete: function() {
+                            console.log('AJAX complete.');
+                            submitButton.removeClass('is-loading');
+                        }
+                    });
             })
             .catch(errorMsg => {
-                // This catch block handles errors that occurred during the file reading Promises
                 console.error('File reading process error caught:', errorMsg);
                 messageArea.html(`<div class="notification is-danger">Error preparing files: ${errorMsg}. Please try selecting files again.</div>`);
                 messageArea.addClass('is-danger');
@@ -473,26 +525,26 @@
 
       // --- JavaScript to control the modal ---
       viewExampleButton.on('click', function() {
-          exampleModal.addClass('is-active'); // Show the modal
+          exampleModal.addClass('is-active');
       });
 
       modalBackground.on('click', function() {
-          exampleModal.removeClass('is-active'); // Hide the modal when background is clicked
+          exampleModal.removeClass('is-active');
       });
 
-       modalCloseButton.on('click', function() {
-          exampleModal.removeClass('is-active'); // Hide the modal when close button is clicked
-       });
+        modalCloseButton.on('click', function() {
+          exampleModal.removeClass('is-active');
+        });
 
-       // Close modal with Escape key
-       $(document).on('keydown', function(event) {
-           if (event.key === "Escape") {
-               exampleModal.removeClass('is-active');
-           }
-       });
+        $(document).on('keydown', function(event) {
+            if (event.key === "Escape") {
+                exampleModal.removeClass('is-active');
+            }
+        });
       // --- End JavaScript to control the modal ---
 
-
+      // Initial render when the page loads
+      renderSelectedFiles();
     });
   </script>
 
