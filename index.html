@@ -172,6 +172,54 @@
     <p class="subtitle is-6 has-text-centered">Please provide your email and select one or more files to upload.</p>
 
       <div class="content" style="margin-bottom: 25px;">
+        <h3>Instructions: How to Upload Contract Photos</h3>
+        <ol>
+            <li><strong>Find your car contract:</strong> Look for the papers you signed at the dealership.</li>
+            <li><strong>Prepare to take photos:</strong>
+                <ol type="a">
+                    <li>Go to a bright place (use daylight or a lamp).</li>
+                    <li>Place the contract flat on a table.</li>
+                    <li>Make sure there are no shadows, folds, or wrinkles.</li>
+                </ol>
+            </li>
+            <li><strong>Find the right page(s) in the contract:</strong> Look for pages that include:
+                <ul>
+                    <li>Dealer name and address</li>
+                    <li>Vehicle details (make, model, year, VIN)</li>
+                    <li>Total vehicle price</li>
+                    <li>Monthly payment amount</li>
+                    <li>APR (interest rate)</li>
+                    <li>Loan or lease term (number of months)</li>
+                    <li>Fees and taxes</li>
+                    <li>Add-on products (warranty, gap insurance, paint protection, etc.)</li>
+                    <li>Down payment and trade-in value</li>
+                </ul>
+            </li>
+            <li><strong>Look at the example:</strong> To better locate these items, please look at the sample contract by clicking "View Example Page" below.</li>
+            <li><strong>Take a clear photo:</strong>
+                <ol type="a">
+                    <li>Use your phone’s camera.</li>
+                    <li>Hold the phone directly above the page.</li>
+                    <li>Make sure the full page is in the picture, including all corners.</li>
+                    <li>Do not crop or zoom in too much.</li>
+                </ol>
+            </li>
+            <li><strong>Take more than one photo if needed:</strong>
+                <ol type="a">
+                    <li>If the contract is on multiple pages, take one photo per page.</li>
+                    <li>If the page is long, take two overlapping photos.</li>
+                    <li>It’s okay to send 2–5 pictures.</li>
+                </ol>
+            </li>
+            <li><strong>Review your photos before sending:</strong>
+                <ol type="a">
+                    <li>Make sure the numbers and text are clear and easy to read.</li>
+                    <li>If anything looks blurry, dark, or cut off, retake the photo.</li>
+                </ol>
+            </li>
+            <li><strong>Upload your photos:</strong> Send all your photos using the upload section below.</li>
+        </ol>
+        <hr>
         <p><strong>Please upload your final, signed contract document(s).</strong></p>
         <ul>
             <li>For **pictures** (JPG, PNG, HEIC), ensure they are **clear, readable, well-lit**, and show the **full page** without cut-offs.</li>
@@ -325,7 +373,7 @@
 
               const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'image/heic', 'image/heif'];
               const allowedExtensionsRegex = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
-              const maxSizeInBytes = 50 * 1024 * 1024; // 10MB limit per file
+              const maxSizeInBytes = 50 * 1024 * 1024; // 50MB limit per file
 
               for (const file of newFiles) {
                   // Create a unique key for the file to store in the Map
