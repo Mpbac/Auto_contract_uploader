@@ -341,28 +341,28 @@
         </div>
         <button class="modal-close is-large" aria-label="close"></button>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            const uploadFormContainer = $('#uploadFormContainer'); // New
+            const uploadFormContainer = $('#uploadFormContainer');
             const uploadForm = $('#uploadForm');
             const emailInput = $('#emailInput');
             const contractFileInput = $('#contractFile');
-            const selectedFilesList = $('#selectedFilesList'); // Updated: now a container for the list
-            const clearAllFilesButton = $('#clearAllFilesButton'); // New button
+            const selectedFilesList = $('#selectedFilesList');
+            const clearAllFilesButton = $('#clearAllFilesButton');
             const messageArea = $('#messageArea');
             const submitButton = $('#submitButton');
 
-            // New elements for survey questions
-            const questionsContainer = $('#questionsContainer'); // New
-            const surveyForm = $('#surveyForm'); // New
-            const dealSatisfactionInput = $('#dealSatisfaction'); // New
-            const timeSpentInput = $('#timeSpent'); // New
-            const stressScaleInput = $('#stressScale'); // New
-            const stressScaleOutput = $('#stressScaleOutput'); // New
-            const submitSurveyButton = $('#submitSurveyButton'); // New
-            const surveyMessageArea = $('#surveyMessageArea'); // New
+            const questionsContainer = $('#questionsContainer');
+            const surveyForm = $('#surveyForm');
+            const dealSatisfactionInput = $('#dealSatisfaction');
+            const timeSpentInput = $('#timeSpent');
+            const stressScaleInput = $('#stressScale');
+            const stressScaleOutput = $('#stressScaleOutput');
+            const submitSurveyButton = $('#submitSurveyButton');
+            const surveyMessageArea = $('#surveyMessageArea');
 
 
             const exampleModal = $('#exampleModal');
@@ -370,11 +370,10 @@
             const modalBackground = $('.modal-background');
             const modalCloseButton = $('.modal-close');
 
-            // ONLY ONE SCRIPT URL IS NEEDED NOW
-            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbdFSE6SV8AIJfPJBG15nrKhNWPk8dsSdelEGWX7a-YsnyRUfem_PQlaV4Wn1sG5crEA/exec"; // REPLACE ME with your *single* script URL
+            // IMPORTANT: Replace this with your actual deployed Google Apps Script URL
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbdFSE6SV8AIJfPJBG15nrKhNWPk8dsSdelEGWX7a-YsnyRUfem_PQlaV4Wn1sG5crEA/exec";
 
             // Use a Map to store files, using a unique key (e.g., file.name + file.size + file.lastModified)
-            // This helps in managing individual files and avoids issues with duplicate names if sizes/dates differ.
             let filesToUpload = new Map();
 
 
@@ -409,8 +408,6 @@
                 renderSelectedFiles(); // Re-render the list
                 messageArea.html(''); // Clear any previous messages
                 messageArea.removeClass('is-danger is-success is-warning is-info');
-                // Important: If the file input had a value, it's now out of sync.
-                // For simplicity, we don't try to sync it back, but rely on filesToUpload Map.
             });
 
             // Event listener for clearing all files
@@ -426,55 +423,49 @@
             // Event listener for the main contract file input
             contractFileInput.on('change', function() {
                 console.log('Main contract file input changed. New files selected:', this.files.length);
-                // Don't clear messageArea here, only on form submit
+                messageArea.html(''); // Clear previous error messages when new files are selected
+                messageArea.removeClass('is-danger is-success is-warning is-info');
 
                 if (this.files.length > 0) {
                     let allNewFilesValid = true;
                     const newFiles = Array.from(this.files);
 
+                    // Added image/heic, image/heif for HEIC support
                     const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'image/heic', 'image/heif'];
                     const allowedExtensionsRegex = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
                     const maxSizeInBytes = 50 * 1024 * 1024; // 50MB limit per file
 
                     for (const file of newFiles) {
-                        // Create a unique key for the file to store in the Map
                         const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
 
-                        // Validate MIME type and extension
-                        if (!allowedMimeTypes.includes(file.type) && !allowedExtensionsRegex.test(file.name)) {
+                        if (!allowedMimeTypes.includes(file.type) && !allowedExtensionsRegex.test(file.name.toLowerCase())) {
                             messageArea.html(`<div class="notification is-danger">Error: Invalid file type for "${file.name}". Only PDF, PNG, JPG, and HEIC files are accepted.</div>`);
                             messageArea.addClass('is-danger');
                             allNewFilesValid = false;
                             break;
                         }
 
-                        // Validate file size
                         if (file.size > maxSizeInBytes) {
                             messageArea.html(`<div class="notification is-danger">Error: File "${file.name}" is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB per file.</div>`);
                             messageArea.addClass('is-danger');
                             allNewFilesValid = false;
                             break;
                         }
-
-                        // If valid, add to the Map (will overwrite if same key, which is fine for re-selecting same file)
                         filesToUpload.set(fileKey, file);
                     }
 
                     if (allNewFilesValid) {
-                        renderSelectedFiles(); // Re-render the list with all accumulated files
-                        messageArea.html(''); // Clear previous error messages if new files are valid
+                        renderSelectedFiles();
+                        messageArea.html('');
                         messageArea.removeClass('is-danger');
                     } else {
                         // If any new file is invalid, clear the input value but keep previously valid files
                         this.value = ''; // Clear the input so user can re-select
-                        // The invalid file(s) are not added to filesToUpload, so no need to remove them.
-                        // The error message for the invalid file is already set.
                     }
 
                 } else {
                     // If the user opened the picker but selected no new files (or cancelled)
                     // We don't clear filesToUpload here. They might just be closing the picker.
-                    // The renderSelectedFiles() will still show existing files.
                     messageArea.html('');
                     messageArea.removeClass('is-danger is-success is-warning is-info');
                 }
@@ -486,7 +477,6 @@
 
                 const emailAddress = emailInput.val().trim();
 
-                // --- Frontend Validation Checks ---
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailAddress || !emailRegex.test(emailAddress)) {
                     messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
@@ -495,19 +485,16 @@
                     return;
                 }
 
-                if (filesToUpload.size === 0) { // Check the Map size
+                if (filesToUpload.size === 0) {
                     messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
                     messageArea.addClass('is-warning');
                     contractFileInput.focus();
                     return;
                 }
-                // --- End Frontend Validation Checks ---
-
 
                 submitButton.addClass('is-loading');
                 messageArea.html('<div class="notification is-info">Reading files and preparing for upload...</div>');
                 messageArea.addClass('is-info');
-
 
                 const postData = {
                     type: 'contract_upload', // Indicate this is a contract upload
@@ -515,7 +502,7 @@
                     files: [] // Array to hold main contract file data objects
                 };
 
-                const filesToRead = Array.from(filesToUpload.values()); // Get all File objects from the Map
+                const filesToRead = Array.from(filesToUpload.values());
                 let filesReadCount = 0;
                 const totalFilesToRead = filesToRead.length;
 
@@ -524,22 +511,21 @@
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             try {
-                               const base64Data = e.target.result.split(',')[1];
-                               const mimeType = file.type || 'application/octet-stream';
-                               const filename = file.name;
+                                const base64Data = e.target.result.split(',')[1];
+                                const mimeType = file.type || 'application/octet-stream';
+                                const filename = file.name;
 
-                               postData.files.push({
-                                   data: base64Data,
-                                   mimetype: mimeType,
-                                   filename: filename
-                               });
-                               console.log(`Finished reading contract file: "${filename}"`);
-
-                               filesReadCount++;
-                               resolve();
+                                postData.files.push({
+                                    data: base64Data,
+                                    mimetype: mimeType,
+                                    filename: filename
+                                });
+                                console.log(`Finished reading contract file: "${filename}"`);
+                                filesReadCount++;
+                                resolve();
                             } catch (err) {
-                               console.error('FileReader processing error for file:', file.name, err);
-                               reject(`Error processing file "${file.name}": ${err.message}`);
+                                console.error('FileReader processing error for file:', file.name, err);
+                                reject(`Error processing file "${file.name}": ${err.message}`);
                             }
                         };
                         reader.onerror = function(err) {
@@ -561,7 +547,7 @@
                         messageArea.html(`<div class="notification is-info">All files read. Sending ${totalFilesToRead} file(s)...</div>`);
 
                         $.ajax({
-                            url: GOOGLE_SCRIPT_URL, // Now using the single URL
+                            url: GOOGLE_SCRIPT_URL,
                             type: 'POST',
                             data: postData,
                             dataType: 'json',
@@ -571,7 +557,6 @@
                                 if (data && data.status === 'success') {
                                     messageArea.html('<div class="notification is-success">Successfully uploaded your files! Please answer a few questions below.</div>');
                                     messageArea.addClass('is-success');
-                                    // Instead of resetting the form, hide it and show survey questions
                                     uploadFormContainer.hide();
                                     questionsContainer.show();
                                     emailInput.prop('disabled', true); // Keep email for the survey, but disable editing
@@ -590,34 +575,33 @@
                                 if (textStatus === 'timeout') {
                                     errorMessage += ' The request timed out.';
                                 } else if (jqXHR.status === 0) {
-                                     errorMessage += ' Network error or server did not respond.';
+                                    errorMessage += ' Network error or server did not respond.';
                                 } else if (jqXHR.status === 404) {
-                                     errorMessage += ' Server not found. Check the script URL.';
+                                    errorMessage += ' Server not found. Check the script URL.';
                                 } else if (jqXHR.status >= 500) {
-                                     errorMessage += ' Server error. Check the Apps Script execution logs.';
+                                    errorMessage += ' Server error. Check the Apps Script execution logs.';
                                 } else if (errorThrown === 'parsererror') {
-                                     errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
-                                }
-                                 else {
-                                     errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                                    errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
+                                } else {
+                                    errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
                                 }
 
-                                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                                     errorMessage += ' Details: ' + jqXHR.responseJSON.message;
-                                 } else if (jqXHR.responseText) {
-                                     try {
-                                         const responseJson = JSON.parse(jqXHR.responseText);
-                                         if(responseJson.message) {
-                                             errorMessage += ' Details: ' + responseJson.message;
-                                         } else {
-                                             const snippet = jqXHR.responseText.substring(0, 200);
-                                             errorMessage += ' Server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
-                                         }
-                                     } catch (e) {
-                                         const snippet = jqXHR.responseText.substring(0, 200);
-                                         errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
-                                     }
-                                 }
+                                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                                    errorMessage += ' Details: ' + jqXHR.responseJSON.message;
+                                } else if (jqXHR.responseText) {
+                                    try {
+                                        const responseJson = JSON.parse(jqXHR.responseText);
+                                        if(responseJson.message) {
+                                            errorMessage += ' Details: ' + responseJson.message;
+                                        } else {
+                                            const snippet = jqXHR.responseText.substring(0, 200);
+                                            errorMessage += ' Server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                        }
+                                    } catch (e) {
+                                        const snippet = jqXHR.responseText.substring(0, 200);
+                                        errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                    }
+                                }
 
                                 messageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
                                 messageArea.addClass('is-danger');
@@ -637,7 +621,6 @@
             });
 
             // --- Survey Form Logic ---
-            // Update stress scale output dynamically
             stressScaleInput.on('input', function() {
                 stressScaleOutput.text($(this).val());
             });
@@ -645,81 +628,68 @@
             surveyForm.on('submit', function(event) {
                 event.preventDefault();
 
-                const emailAddressForSurvey = emailInput.val().trim(); // Use the email from the upload form
+                // Show loading indicator
+                submitSurveyButton.addClass('is-loading');
+                surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
+                surveyMessageArea.addClass('is-info');
+
+                const emailAddressForSurvey = emailInput.val().trim(); // Get email from the first form
                 const dealSatisfaction = dealSatisfactionInput.val().trim();
-                const timeSpent = timeSpentInput.val(); // Get numerical value directly
-                const stressScale = stressScaleInput.val(); // Get numerical value directly
+                const timeSpent = timeSpentInput.val();
+                const stressScale = stressScaleInput.val();
 
                 // Basic validation for survey questions (optional, but good practice)
                 if (!dealSatisfaction && !timeSpent && !stressScale) {
                     surveyMessageArea.html('<div class="notification is-warning">Please answer at least one question before submitting.</div>');
                     surveyMessageArea.addClass('is-warning');
+                    submitSurveyButton.removeClass('is-loading');
                     return;
                 }
 
-                // More specific validation for timeSpent if it's required to be a valid number
-                if (timeSpent !== '' && (isNaN(timeSpent) || parseFloat(timeSpent) < 0)) {
-                    surveyMessageArea.html('<div class="notification is-warning">Please enter a valid number for hours spent (0 or more).</div>');
-                    surveyMessageArea.addClass('is-warning');
-                    timeSpentInput.focus();
-                    return;
-                }
-
-                submitSurveyButton.addClass('is-loading');
-                surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
-                surveyMessageArea.addClass('is-info');
-
-                const surveyData = {
-                    type: 'survey_submission', // IMPORTANT: Indicate this is a survey submission
+                const surveyPayload = {
+                    type: 'survey_submission', // Indicate this is a survey submission
                     emailAddress: emailAddressForSurvey,
                     dealSatisfaction: dealSatisfaction,
-                    timeSpentHours: timeSpent !== '' ? parseFloat(timeSpent) : null, // Store as number or null if empty
-                    stressScale: parseInt(stressScale) // Store as integer
+                    timeSpent: timeSpent,
+                    stressScale: stressScale
                 };
 
-                console.log('Survey data payload:', surveyData);
-
                 $.ajax({
-                    url: GOOGLE_SCRIPT_URL, // Now using the single URL for survey
+                    url: GOOGLE_SCRIPT_URL,
                     type: 'POST',
-                    data: surveyData,
+                    data: surveyPayload,
                     dataType: 'json',
-                    timeout: 60000, // 1 minute timeout for survey submission
-                    success: function(data) {
-                        console.log('Survey AJAX success response:', data);
-                        if (data && data.status === 'success') {
-                            surveyMessageArea.html('<div class="notification is-success">Thank you! Your feedback has been submitted.</div>');
+                    success: function(response) {
+                        console.log('Survey AJAX success response:', response);
+                        submitSurveyButton.removeClass('is-loading'); // Re-enable button
+
+                        if (response && response.status === 'success') {
+                            surveyMessageArea.html('<div class="notification is-success">Thank you for your feedback!</div>');
                             surveyMessageArea.addClass('is-success');
-                            surveyForm[0].reset(); // Reset survey form fields
-                            stressScaleOutput.text(stressScaleInput.val()); // Reset slider output
-                            // Optionally, you could hide the survey form again or redirect the user
-                            // For now, just show the success message.
+                            surveyForm[0].reset(); // Reset survey form
+                            emailInput.prop('disabled', false); // Re-enable email for next use
+                            uploadFormContainer.show(); // Show upload form again if needed
+                            questionsContainer.hide(); // Hide survey questions
                         } else {
-                            surveyMessageArea.html(`<div class="notification is-danger">Submission failed: ${data ? (data.message || 'Unknown error during submission.') : 'Invalid response from server.'}</div>`);
+                            surveyMessageArea.html(`<div class="notification is-danger">Survey submission failed: ${response ? (response.message || 'Unknown error.') : 'Invalid response from server.'}</div>`);
                             surveyMessageArea.addClass('is-danger');
-                            console.error('Survey Submission Error Response from server:', data);
+                            console.error('Survey Error Response from server:', response);
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error('Survey AJAX Error:', textStatus, errorThrown, jqXHR);
-                        let errorMessage = 'Submission failed.';
-                        if (textStatus === 'timeout') {
-                            errorMessage += ' The request timed out.';
-                        } else {
-                               errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                        submitSurveyButton.removeClass('is-loading'); // Re-enable button
+                        let errorMessage = 'Survey submission failed: Network error or server did not respond.';
+                        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                            errorMessage += ' Details: ' + jqXHR.responseJSON.message;
                         }
                         surveyMessageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
                         surveyMessageArea.addClass('is-danger');
-                    },
-                    complete: function() {
-                        console.log('Survey AJAX complete.');
-                        submitSurveyButton.removeClass('is-loading');
                     }
                 });
             });
 
-
-            // Modal functionality
+            // --- Modal Logic ---
             viewExampleButton.on('click', function() {
                 exampleModal.addClass('is-active');
             });
@@ -732,7 +702,7 @@
                 exampleModal.removeClass('is-active');
             });
 
-            // Initial render of selected files list
+            // Initial render of selected files list (should be empty initially)
             renderSelectedFiles();
         });
     </script>
