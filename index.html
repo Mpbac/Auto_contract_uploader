@@ -20,7 +20,7 @@
       align-items: center;
       min-height: 100vh;
     }
-    .form-upload-container {
+    .form-upload-container, .questions-container { /* Apply styling to both containers */
       max-width: 600px;
       width: 100%;
       margin: 30px auto;
@@ -131,8 +131,25 @@
         margin-top: 10px;
     }
 
+    /* Style for the range input */
+    .range-input-container {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+    }
+    .range-input-container input[type="range"] {
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+    .range-input-container output {
+        font-weight: bold;
+        min-width: 30px; /* Ensure space for two-digit numbers */
+        text-align: right;
+    }
+
+
     @media (max-width: 768px) {
-      .form-upload-container {
+      .form-upload-container, .questions-container {
         padding: 20px;
         margin: 20px auto;
       }
@@ -167,7 +184,7 @@
     </div>
   </section>
 
-  <div class="form-upload-container">
+  <div class="form-upload-container" id="uploadFormContainer">
     <h2 class="title is-4 has-text-centered">Upload Your Contract Document(s)</h2>
     <p class="subtitle is-6 has-text-centered">Please provide your email and select one or more files to upload.</p>
 
@@ -183,7 +200,7 @@
                 </ol>
             </li>
             <li><strong>Find the right page(s) in the contract:</strong> Look for pages that include:
-                   <ol type="a">
+                    <ol type="a">
                     <li>Dealer name and address</li>
                     <li>Vehicle details (make, model, year, VIN)</li>
                     <li>Total vehicle price</li>
@@ -222,10 +239,10 @@
     </div>
 
     <div class="example-button-container">
-          <p class="is-size-7" style="margin-bottom: 10px;">Click below to see an example of pages to include:</p>
-          <button type="button" class="button is-link is-medium" id="viewExampleButton">
-            View Example Page
-          </button>
+            <p class="is-size-7" style="margin-bottom: 10px;">Click below to see an example of pages to include:</p>
+            <button type="button" class="button is-link is-medium" id="viewExampleButton">
+              View Example Page
+            </button>
     </div>
     <form id="uploadForm">
         <div class="field">
@@ -276,6 +293,45 @@
     <div id="messageArea" class="content"></div>
   </div>
 
+  <div class="questions-container" id="questionsContainer" style="display: none;">
+      <h2 class="title is-4 has-text-centered">Tell Us About Your Experience</h2>
+      <p class="subtitle is-6 has-text-centered">Thank you for uploading your documents! Please answer a few quick questions about your recent car purchase.</p>
+
+      <form id="surveyForm">
+          <div class="field">
+              <label class="label" for="dealSatisfaction">Overall, how satisfied are you with your car purchase deal?</label>
+              <div class="control">
+                  <textarea class="textarea" id="dealSatisfaction" placeholder="e.g., I feel I got a fair price, or I was pressured into extras." rows="3"></textarea>
+              </div>
+          </div>
+
+          <div class="field">
+              <label class="label" for="timeSpent">Approximately how many hours did you spend on the car purchase process (including research, dealership visits, paperwork, etc.)?</label>
+              <div class="control">
+                  <input class="input" type="number" id="timeSpent" min="0" step="0.5" placeholder="e.g., 10.5">
+              </div>
+          </div>
+
+          <div class="field">
+              <label class="label" for="stressScale">On a scale of 1 to 10 (1 = Not at all stressful, 10 = Extremely stressful), how stressful was the car buying process for you?</label>
+              <div class="control range-input-container">
+                  <input type="range" id="stressScale" min="1" max="10" value="5">
+                  <output for="stressScale" id="stressScaleOutput">5</output>
+              </div>
+          </div>
+
+          <div class="field mt-5">
+              <div class="control">
+                  <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitSurveyButton">
+                      <span class="icon is-small"><i class="fas fa-paper-plane"></i></span> <span>Submit Answers</span>
+                  </button>
+              </div>
+          </div>
+      </form>
+      <div id="surveyMessageArea" class="content mt-3"></div>
+  </div>
+
+
   <div id="exampleModal" class="modal">
     <div class="modal-background"></div>
     <div class="modal-content">
@@ -289,6 +345,7 @@
 
   <script>
     $(document).ready(function() {
+      const uploadFormContainer = $('#uploadFormContainer'); // New
       const uploadForm = $('#uploadForm');
       const emailInput = $('#emailInput');
       const contractFileInput = $('#contractFile');
@@ -297,12 +354,24 @@
       const messageArea = $('#messageArea');
       const submitButton = $('#submitButton');
 
+      // New elements for survey questions
+      const questionsContainer = $('#questionsContainer'); // New
+      const surveyForm = $('#surveyForm'); // New
+      const dealSatisfactionInput = $('#dealSatisfaction'); // New
+      const timeSpentInput = $('#timeSpent'); // New
+      const stressScaleInput = $('#stressScale'); // New
+      const stressScaleOutput = $('#stressScaleOutput'); // New
+      const submitSurveyButton = $('#submitSurveyButton'); // New
+      const surveyMessageArea = $('#surveyMessageArea'); // New
+
+
       const exampleModal = $('#exampleModal');
       const viewExampleButton = $('#viewExampleButton');
       const modalBackground = $('.modal-background');
       const modalCloseButton = $('.modal-close');
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-qi89_2nktIW--lThd4FjZ9Egp9EXP0RxX2nTrLQp1ROuOgX1Qwgx5fTb70TV8jKCUA/exec"; // REPLACE ME
+      const GOOGLE_SCRIPT_URL_UPLOAD = "https://script.google.com/macros/s/AKfycbw-qi89_2nktIW--lThd4FjZ9Egp9EXP0RxX2nTrLQp1ROuOgX1Qwgx5fTb70TV8jKCUA/exec"; // REPLACE ME with your upload script URL
+      const GOOGLE_SCRIPT_URL_SURVEY = "https://script.google.com/macros/s/YOUR_SURVEY_SCRIPT_ID/exec"; // !!! IMPORTANT: REPLACE ME with your new survey script URL !!!
 
       // Use a Map to store files, using a unique key (e.g., file.name + file.size + file.lastModified)
       // This helps in managing individual files and avoids issues with duplicate names if sizes/dates differ.
@@ -491,7 +560,7 @@
                     messageArea.html(`<div class="notification is-info">All files read. Sending ${totalFilesToRead} file(s)...</div>`);
 
                     $.ajax({
-                        url: GOOGLE_SCRIPT_URL,
+                        url: GOOGLE_SCRIPT_URL_UPLOAD, // Use the upload script URL
                         type: 'POST',
                         data: postData,
                         dataType: 'json',
@@ -499,11 +568,14 @@
                         success: function(data) {
                             console.log('AJAX success response:', data);
                             if (data && data.status === 'success') {
-                                messageArea.html('<div class="notification is-success">Successfully submitted. Your files have been uploaded.</div>');
+                                messageArea.html('<div class="notification is-success">Successfully uploaded your files! Please answer a few questions below.</div>');
                                 messageArea.addClass('is-success');
-                                uploadForm[0].reset();
-                                filesToUpload.clear(); // Clear the Map
-                                renderSelectedFiles(); // Update display
+                                // Instead of resetting the form, hide it and show survey questions
+                                uploadFormContainer.hide();
+                                questionsContainer.show();
+                                emailInput.prop('disabled', true); // Keep email for the survey, but disable editing
+                                filesToUpload.clear(); // Clear files after successful upload
+                                renderSelectedFiles(); // Update display for files
                             } else {
                                 messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
                                 messageArea.addClass('is-danger');
@@ -526,7 +598,7 @@
                                  errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
                             }
                              else {
-                                errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                                 errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
                              }
 
                              if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
@@ -563,6 +635,88 @@
             });
       });
 
+      // --- Survey Form Logic ---
+      // Update stress scale output dynamically
+      stressScaleInput.on('input', function() {
+          stressScaleOutput.text($(this).val());
+      });
+
+      surveyForm.on('submit', function(event) {
+          event.preventDefault();
+
+          const emailAddressForSurvey = emailInput.val().trim(); // Use the email from the upload form
+          const dealSatisfaction = dealSatisfactionInput.val().trim();
+          const timeSpent = timeSpentInput.val(); // Get numerical value directly
+          const stressScale = stressScaleInput.val(); // Get numerical value directly
+
+          // Basic validation for survey questions (optional, but good practice)
+          if (!dealSatisfaction && !timeSpent && !stressScale) {
+              surveyMessageArea.html('<div class="notification is-warning">Please answer at least one question before submitting.</div>');
+              surveyMessageArea.addClass('is-warning');
+              return;
+          }
+
+          // More specific validation for timeSpent if it's required to be a valid number
+          if (timeSpent !== '' && (isNaN(timeSpent) || parseFloat(timeSpent) < 0)) {
+              surveyMessageArea.html('<div class="notification is-warning">Please enter a valid number for hours spent (0 or more).</div>');
+              surveyMessageArea.addClass('is-warning');
+              timeSpentInput.focus();
+              return;
+          }
+
+          submitSurveyButton.addClass('is-loading');
+          surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
+          surveyMessageArea.addClass('is-info');
+
+          const surveyData = {
+              emailAddress: emailAddressForSurvey,
+              dealSatisfaction: dealSatisfaction,
+              timeSpentHours: timeSpent !== '' ? parseFloat(timeSpent) : null, // Store as number or null if empty
+              stressScale: parseInt(stressScale) // Store as integer
+          };
+
+          console.log('Survey data payload:', surveyData);
+
+          $.ajax({
+              url: GOOGLE_SCRIPT_URL_SURVEY, // Use the new survey script URL
+              type: 'POST',
+              data: surveyData,
+              dataType: 'json',
+              timeout: 60000, // 1 minute timeout for survey submission
+              success: function(data) {
+                  console.log('Survey AJAX success response:', data);
+                  if (data && data.status === 'success') {
+                      surveyMessageArea.html('<div class="notification is-success">Thank you! Your feedback has been submitted.</div>');
+                      surveyMessageArea.addClass('is-success');
+                      surveyForm[0].reset(); // Reset survey form fields
+                      stressScaleOutput.text(stressScaleInput.val()); // Reset slider output
+                      // Optionally, you could hide the survey form again or redirect the user
+                      // For now, just show the success message.
+                  } else {
+                      surveyMessageArea.html(`<div class="notification is-danger">Submission failed: ${data ? (data.message || 'Unknown error during submission.') : 'Invalid response from server.'}</div>`);
+                      surveyMessageArea.addClass('is-danger');
+                      console.error('Survey Submission Error Response from server:', data);
+                  }
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                  console.error('Survey AJAX Error:', textStatus, errorThrown, jqXHR);
+                  let errorMessage = 'Submission failed.';
+                  if (textStatus === 'timeout') {
+                      errorMessage += ' The request timed out.';
+                  } else {
+                       errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                  }
+                  surveyMessageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
+                  surveyMessageArea.addClass('is-danger');
+              },
+              complete: function() {
+                  console.log('Survey AJAX complete.');
+                  submitSurveyButton.removeClass('is-loading');
+              }
+          });
+      });
+
+
       // --- JavaScript to control the modal ---
       viewExampleButton.on('click', function() {
           exampleModal.addClass('is-active');
@@ -587,6 +741,5 @@
       renderSelectedFiles();
     });
   </script>
-
 </body>
 </html>
