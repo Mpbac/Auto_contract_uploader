@@ -1,745 +1,740 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload Contract Documents</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <style>
-    :root {
-      --custom-primary-color: #00693e; /* Example: Dartmouth Green */
-      --custom-light-bg: #f8f8f8;
-    }
-    body {
-      background-color: var(--custom-light-bg);
-      padding-top: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .form-upload-container, .questions-container { /* Apply styling to both containers */
-      max-width: 600px;
-      width: 100%;
-      margin: 30px auto;
-      background-color: white;
-      padding: 30px 40px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-      border-radius: 10px;
-    }
-    .hero.is-primary-custom {
-      background-color: var(--custom-primary-color);
-      width: 100%;
-    }
-
-    .hero-body .container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero .title {
-      color: white;
-      font-size: 2.2em;
-      font-weight: 600;
-      margin-left: 1.5rem;
-      margin-bottom: 0;
-    }
-
-    .banner-logo {
-      max-height: 70px;
-      width: auto;
-    }
-
-    .file-upload-area {
-      margin-bottom: 25px;
-    }
-
-    /* Updated styling for the file list display */
-    #selectedFilesList {
-        margin-top: 10px;
-        border: 1px solid #dbdbdb;
-        border-radius: 4px;
-        background-color: #fff;
-        padding: 10px;
-        min-height: 40px; /* Ensure it's visible even if empty */
-        box-sizing: border-box;
-    }
-
-    .selected-file-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 5px 0;
-        border-bottom: 1px dashed #eee;
-        font-size: 0.9em;
-        color: #4a4a4a;
-    }
-    .selected-file-item:last-child {
-        border-bottom: none;
-    }
-    .selected-file-item .file-name-text {
-        flex-grow: 1;
-        word-break: break-all; /* Ensure long filenames wrap */
-        margin-right: 10px;
-    }
-    .selected-file-item .delete-file {
-        background: none;
-        border: none;
-        color: #ff3860; /* Bulma danger color */
-        cursor: pointer;
-        font-size: 1.1em;
-        padding: 0 5px;
-        line-height: 1;
-        transition: color 0.2s ease;
-    }
-    .selected-file-item .delete-file:hover {
-        color: #b71c1c;
-    }
-
-
-    #messageArea {
-        margin-top: 20px;
-        font-weight: bold;
-    }
-
-    #messageArea .notification {
-        margin-bottom: 0; /* Prevent double margin with Bulma's default */
-    }
-
-    .button.is-primary-custom {
-      background-color: var(--custom-primary-color);
-      color: white;
-      font-weight: bold;
-    }
-    .button.is-primary-custom:hover {
-      background-color: #005a34;
-    }
-
-    /* Style for the example button */
-    .example-button-container {
-        margin-bottom: 25px; /* Space after instructions */
-        text-align: center; /* Center the button */
-    }
-
-    .file-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
-    }
-
-    /* Style for the range input */
-    .range-input-container {
-        display: flex;
-        align-items: center;
-        margin-top: 5px;
-    }
-    .range-input-container input[type="range"] {
-        flex-grow: 1;
-        margin-right: 10px;
-    }
-    .range-input-container output {
-        font-weight: bold;
-        min-width: 30px; /* Ensure space for two-digit numbers */
-        text-align: right;
-    }
-
-
-    @media (max-width: 768px) {
-      .form-upload-container, .questions-container {
-        padding: 20px;
-        margin: 20px auto;
-      }
-      .banner-logo {
-            max-height: 50px;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Upload Contract Documents</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        :root {
+            --custom-primary-color: #00693e; /* Example: Dartmouth Green */
+            --custom-light-bg: #f8f8f8;
         }
-        .hero .title {
-            font-size: 1.8em;
-            margin-left: 1rem; /* Adjusted for smaller screens */
+        body {
+            background-color: var(--custom-light-bg);
+            padding-top: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
+        .form-upload-container, .questions-container { /* Apply styling to both containers */
+            max-width: 600px;
+            width: 100%;
+            margin: 30px auto;
+            background-color: white;
+            padding: 30px 40px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+        .hero.is-primary-custom {
+            background-color: var(--custom-primary-color);
+            width: 100%;
+        }
+
         .hero-body .container {
-            flex-direction: column; /* Stack logo and title on small screens */
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .banner-logo {
-            margin-bottom: 10px; /* Space between logo and title */
-        }
+
         .hero .title {
-            margin-left: 0; /* Center title */
+            color: white;
+            font-size: 2.2em;
+            font-weight: 600;
+            margin-left: 1.5rem;
+            margin-bottom: 0;
         }
-    }
-  </style>
+
+        .banner-logo {
+            max-height: 70px;
+            width: auto;
+        }
+
+        .file-upload-area {
+            margin-bottom: 25px;
+        }
+
+        /* Updated styling for the file list display */
+        #selectedFilesList {
+            margin-top: 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            background-color: #fff;
+            padding: 10px;
+            min-height: 40px; /* Ensure it's visible even if empty */
+            box-sizing: border-box;
+        }
+
+        .selected-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9em;
+            color: #4a4a4a;
+        }
+        .selected-file-item:last-child {
+            border-bottom: none;
+        }
+        .selected-file-item .file-name-text {
+            flex-grow: 1;
+            word-break: break-all; /* Ensure long filenames wrap */
+            margin-right: 10px;
+        }
+        .selected-file-item .delete-file {
+            background: none;
+            border: none;
+            color: #ff3860; /* Bulma danger color */
+            cursor: pointer;
+            font-size: 1.1em;
+            padding: 0 5px;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+        .selected-file-item .delete-file:hover {
+            color: #b71c1c;
+        }
+
+
+        #messageArea {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #messageArea .notification {
+            margin-bottom: 0; /* Prevent double margin with Bulma's default */
+        }
+
+        .button.is-primary-custom {
+            background-color: var(--custom-primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        .button.is-primary-custom:hover {
+            background-color: #005a34;
+        }
+
+        /* Style for the example button */
+        .example-button-container {
+            margin-bottom: 25px; /* Space after instructions */
+            text-align: center; /* Center the button */
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        /* Style for the range input */
+        .range-input-container {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+        .range-input-container input[type="range"] {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .range-input-container output {
+            font-weight: bold;
+            min-width: 30px; /* Ensure space for two-digit numbers */
+            text-align: right;
+        }
+
+
+        @media (max-width: 768px) {
+            .form-upload-container, .questions-container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+            .banner-logo {
+                max-height: 50px;
+            }
+            .hero .title {
+                font-size: 1.8em;
+                margin-left: 1rem; /* Adjusted for smaller screens */
+            }
+            .hero-body .container {
+                flex-direction: column; /* Stack logo and title on small screens */
+                text-align: center;
+            }
+            .banner-logo {
+                margin-bottom: 10px; /* Space between logo and title */
+            }
+            .hero .title {
+                margin-left: 0; /* Center title */
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <section class="hero is-primary-custom is-bold">
-    <div class="hero-body">
-      <div class="container">
-        <img src="D-Pine_Rev.png" alt="Dartmouth Logo" class="banner-logo">
-        <h1 class="title">Contract Document Upload Portal</h1>
-      </div>
-    </div>
-  </section>
+    <section class="hero is-primary-custom is-bold">
+        <div class="hero-body">
+            <div class="container">
+                <img src="D-Pine_Rev.png" alt="Dartmouth Logo" class="banner-logo">
+                <h1 class="title">Contract Document Upload Portal</h1>
+            </div>
+        </div>
+    </section>
 
-  <div class="form-upload-container" id="uploadFormContainer">
-    <h2 class="title is-4 has-text-centered">Upload Your Contract Document(s)</h2>
-    <p class="subtitle is-6 has-text-centered">Please provide your email and select one or more files to upload.</p>
+    <div class="form-upload-container" id="uploadFormContainer">
+        <h2 class="title is-4 has-text-centered">Upload Your Contract Document(s)</h2>
+        <p class="subtitle is-6 has-text-centered">Please provide your email and select one or more files to upload.</p>
 
-      <div class="content" style="margin-bottom: 25px;">
-        <h3>Instructions: How to Upload Contract Photos</h3>
-        <ol>
-            <li><strong>Find your car contract:</strong> Look for the papers you signed at the dealership.</li>
-            <li><strong>Prepare to take photos:</strong>
-                <ol type="a">
-                    <li>Go to a bright place (use daylight or a lamp).</li>
-                    <li>Place the contract flat on a table.</li>
-                    <li>Make sure there are no shadows, folds, or wrinkles.</li>
-                </ol>
-            </li>
-            <li><strong>Find the right page(s) in the contract:</strong> Look for pages that include:
+        <div class="content" style="margin-bottom: 25px;">
+            <h3>Instructions: How to Upload Contract Photos</h3>
+            <ol>
+                <li><strong>Find your car contract:</strong> Look for the papers you signed at the dealership.</li>
+                <li><strong>Prepare to take photos:</strong>
                     <ol type="a">
-                    <li>Dealer name and address</li>
-                    <li>Vehicle details (make, model, year, VIN)</li>
-                    <li>Total vehicle price</li>
-                    <li>Monthly payment amount</li>
-                    <li>APR (interest rate)</li>
-                    <li>Loan or lease term (number of months)</li>
-                    <li>Fees and taxes</li>
-                    <li>Add-on products (warranty, gap insurance, paint protection, etc.)</li>
-                    <li>Down payment and trade-in value</li>
-                </ol>
-            </li>
-            <li><strong>Look at the example:</strong> To better locate these items, please look at the sample contract by clicking "View Example Page" below.</li>
-            <li><strong>Take a clear photo:</strong> 
-                <ol type="a">
-                    <li>Use your phone’s camera.</li>
-                    <li>Hold the phone directly above the page.</li>
-                    <li>Make sure the full page is in the picture, including all corners.</li>
-                    <li>Do not crop or zoom in too much.</li>
-                </ol>
-            </li>
-            <li><strong>Take more than one photo if needed:</strong> 
-                <ol type="a">
-                    <li>If the contract is on multiple pages, take one photo per page.</li>
-                    <li>If the page is long, take two overlapping photos.</li>
-                    <li>It’s okay to send 2–5 pictures.</li>
-                </ol>
-            </li>
-            <li><strong>Review your photos before sending:</strong>
-                <ol type="a">
-                    <li>Make sure the numbers and text are clear and easy to read.</li>
-                    <li>If anything looks blurry, dark, or cut off, retake the photo.</li>
-                </ol>
-            </li>
-            <li><strong>Upload your photos:</strong> Send all your photos using the upload section below.</li>
-        </ol>
-    </div>
+                        <li>Go to a bright place (use daylight or a lamp).</li>
+                        <li>Place the contract flat on a table.</li>
+                        <li>Make sure there are no shadows, folds, or wrinkles.</li>
+                    </ol>
+                </li>
+                <li><strong>Find the right page(s) in the contract:</strong> Look for pages that include:
+                    <ol type="a">
+                        <li>Dealer name and address</li>
+                        <li>Vehicle details (make, model, year, VIN)</li>
+                        <li>Total vehicle price</li>
+                        <li>Monthly payment amount</li>
+                        <li>APR (interest rate)</li>
+                        <li>Loan or lease term (number of months)</li>
+                        <li>Fees and taxes</li>
+                        <li>Add-on products (warranty, gap insurance, paint protection, etc.)</li>
+                        <li>Down payment and trade-in value</li>
+                    </ol>
+                </li>
+                <li><strong>Look at the example:</strong> To better locate these items, please look at the sample contract by clicking "View Example Page" below.</li>
+                <li><strong>Take a clear photo:</strong>
+                    <ol type="a">
+                        <li>Use your phone’s camera.</li>
+                        <li>Hold the phone directly above the page.</li>
+                        <li>Make sure the full page is in the picture, including all corners.</li>
+                        <li>Do not crop or zoom in too much.</li>
+                    </ol>
+                </li>
+                <li><strong>Take more than one photo if needed:</strong>
+                    <ol type="a">
+                        <li>If the contract is on multiple pages, take one photo per page.</li>
+                        <li>If the page is long, take two overlapping photos.</li>
+                        <li>It’s okay to send 2–5 pictures.</li>
+                    </ol>
+                </li>
+                <li><strong>Review your photos before sending:</strong>
+                    <ol type="a">
+                        <li>Make sure the numbers and text are clear and easy to read.</li>
+                        <li>If anything looks blurry, dark, or cut off, retake the photo.</li>
+                    </ol>
+                </li>
+                <li><strong>Upload your photos:</strong> Send all your photos using the upload section below.</li>
+            </ol>
+        </div>
 
-    <div class="example-button-container">
+        <div class="example-button-container">
             <p class="is-size-7" style="margin-bottom: 10px;">Click below to see an example of pages to include:</p>
             <button type="button" class="button is-link is-medium" id="viewExampleButton">
-              View Example Page
+                View Example Page
             </button>
-    </div>
-    <form id="uploadForm">
-        <div class="field">
-            <label class="label" for="emailInput">Your Email Address</label>
-            <div class="control">
-                <input class="input" type="email" id="emailInput" placeholder="e.g., user@example.com" required>
+        </div>
+        <form id="uploadForm">
+            <div class="field">
+                <label class="label" for="emailInput">Your Email Address</label>
+                <div class="control">
+                    <input class="input" type="email" id="emailInput" placeholder="e.g., user@example.com" required>
+                </div>
             </div>
-        </div>
 
-        <div class="field file-upload-area">
-          <label class="label" for="contractFile">Contract File(s) (PDF, PNG, JPG, or HEIC accepted)</label>
-          <div class="control">
-            <div class="file is-boxed is-fullwidth has-name">
-              <label class="file-label">
-                <input class="file-input" type="file" id="contractFile" name="contractFiles[]" accept=".pdf,.png,.jpg,.jpeg,.heic,.heif,application/pdf,image/png,image/jpeg,image/heic,image/heif" multiple required capture="camera">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <span class="file-label">
-                    Choose file(s)…
-                  </span>
-                </span>
-                </label>
+            <div class="field file-upload-area">
+                <label class="label" for="contractFile">Contract File(s) (PDF, PNG, JPG, or HEIC accepted)</label>
+                <div class="control">
+                    <div class="file is-boxed is-fullwidth has-name">
+                        <label class="file-label">
+                            <input class="file-input" type="file" id="contractFile" name="contractFiles[]" accept=".pdf,.png,.jpg,.jpeg,.heic,.heif,application/pdf,image/png,image/jpeg,image/heic,image/heif" multiple required capture="camera">
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">
+                                    Choose file(s)…
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div id="selectedFilesList">
+                    <p class="has-text-grey-light">No file(s) selected.</p>
+                </div>
+                <div class="file-actions">
+                    <button type="button" class="button is-danger is-small is-light" id="clearAllFilesButton" style="display: none;">
+                        <span class="icon is-small"><i class="fas fa-times"></i></span>
+                        <span>Clear All Files</span>
+                    </button>
+                </div>
             </div>
-          </div>
-          <div id="selectedFilesList">
-            <p class="has-text-grey-light">No file(s) selected.</p>
-          </div>
-          <div class="file-actions">
-            <button type="button" class="button is-danger is-small is-light" id="clearAllFilesButton" style="display: none;">
-                <span class="icon is-small"><i class="fas fa-times"></i></span>
-                <span>Clear All Files</span>
-            </button>
-          </div>
-        </div>
 
 
-        <div class="field">
-          <div class="control">
-            <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitButton">
-              <span class="icon is-small"><i class="fas fa-cloud-upload-alt"></i></span> <span>Upload Selected File(s)</span>
-            </button>
-          </div>
-        </div>
-    </form>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitButton">
+                        <span class="icon is-small"><i class="fas fa-cloud-upload-alt"></i></span> <span>Upload Selected File(s)</span>
+                    </button>
+                </div>
+            </div>
+        </form>
 
-    <div id="messageArea" class="content"></div>
-  </div>
-
-  <div class="questions-container" id="questionsContainer" style="display: none;">
-      <h2 class="title is-4 has-text-centered">Tell Us About Your Experience</h2>
-      <p class="subtitle is-6 has-text-centered">Thank you for uploading your documents! Please answer a few quick questions about your recent car purchase.</p>
-
-      <form id="surveyForm">
-          <div class="field">
-              <label class="label" for="dealSatisfaction">Overall, how satisfied are you with your car purchase deal?</label>
-              <div class="control">
-                  <textarea class="textarea" id="dealSatisfaction" placeholder="e.g., I feel I got a fair price, or I was pressured into extras." rows="3"></textarea>
-              </div>
-          </div>
-
-          <div class="field">
-              <label class="label" for="timeSpent">Approximately how many hours did you spend on the car purchase process (including research, dealership visits, paperwork, etc.)?</label>
-              <div class="control">
-                  <input class="input" type="number" id="timeSpent" min="0" step="0.5" placeholder="e.g., 10.5">
-              </div>
-          </div>
-
-          <div class="field">
-              <label class="label" for="stressScale">On a scale of 1 to 10 (1 = Not at all stressful, 10 = Extremely stressful), how stressful was the car buying process for you?</label>
-              <div class="control range-input-container">
-                  <input type="range" id="stressScale" min="1" max="10" value="5">
-                  <output for="stressScale" id="stressScaleOutput">5</output>
-              </div>
-          </div>
-
-          <div class="field mt-5">
-              <div class="control">
-                  <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitSurveyButton">
-                      <span class="icon is-small"><i class="fas fa-paper-plane"></i></span> <span>Submit Answers</span>
-                  </button>
-              </div>
-          </div>
-      </form>
-      <div id="surveyMessageArea" class="content mt-3"></div>
-  </div>
-
-
-  <div id="exampleModal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content">
-      <p class="image">
-        <img src="1.png" alt="Example Financing Terms Page">
-        </p>
+        <div id="messageArea" class="content"></div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
-  </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-  <script>
-    $(document).ready(function() {
-      const uploadFormContainer = $('#uploadFormContainer'); // New
-      const uploadForm = $('#uploadForm');
-      const emailInput = $('#emailInput');
-      const contractFileInput = $('#contractFile');
-      const selectedFilesList = $('#selectedFilesList'); // Updated: now a container for the list
-      const clearAllFilesButton = $('#clearAllFilesButton'); // New button
-      const messageArea = $('#messageArea');
-      const submitButton = $('#submitButton');
+    <div class="questions-container" id="questionsContainer" style="display: none;">
+        <h2 class="title is-4 has-text-centered">Tell Us About Your Experience</h2>
+        <p class="subtitle is-6 has-text-centered">Thank you for uploading your documents! Please answer a few quick questions about your recent car purchase.</p>
 
-      // New elements for survey questions
-      const questionsContainer = $('#questionsContainer'); // New
-      const surveyForm = $('#surveyForm'); // New
-      const dealSatisfactionInput = $('#dealSatisfaction'); // New
-      const timeSpentInput = $('#timeSpent'); // New
-      const stressScaleInput = $('#stressScale'); // New
-      const stressScaleOutput = $('#stressScaleOutput'); // New
-      const submitSurveyButton = $('#submitSurveyButton'); // New
-      const surveyMessageArea = $('#surveyMessageArea'); // New
+        <form id="surveyForm">
+            <div class="field">
+                <label class="label" for="dealSatisfaction">Overall, how satisfied are you with your car purchase deal?</label>
+                <div class="control">
+                    <textarea class="textarea" id="dealSatisfaction" placeholder="e.g., I feel I got a fair price, or I was pressured into extras." rows="3"></textarea>
+                </div>
+            </div>
 
+            <div class="field">
+                <label class="label" for="timeSpent">Approximately how many hours did you spend on the car purchase process (including research, dealership visits, paperwork, etc.)?</label>
+                <div class="control">
+                    <input class="input" type="number" id="timeSpent" min="0" step="0.5" placeholder="e.g., 10.5">
+                </div>
+            </div>
 
-      const exampleModal = $('#exampleModal');
-      const viewExampleButton = $('#viewExampleButton');
-      const modalBackground = $('.modal-background');
-      const modalCloseButton = $('.modal-close');
+            <div class="field">
+                <label class="label" for="stressScale">On a scale of 1 to 10 (1 = Not at all stressful, 10 = Extremely stressful), how stressful was the car buying process for you?</label>
+                <div class="control range-input-container">
+                    <input type="range" id="stressScale" min="1" max="10" value="5">
+                    <output for="stressScale" id="stressScaleOutput">5</output>
+                </div>
+            </div>
 
-      const GOOGLE_SCRIPT_URL_UPLOAD = "https://script.google.com/macros/s/AKfycbw-qi89_2nktIW--lThd4FjZ9Egp9EXP0RxX2nTrLQp1ROuOgX1Qwgx5fTb70TV8jKCUA/exec"; // REPLACE ME with your upload script URL
-      const GOOGLE_SCRIPT_URL_SURVEY = "https://script.google.com/macros/s/YOUR_SURVEY_SCRIPT_ID/exec"; // !!! IMPORTANT: REPLACE ME with your new survey script URL !!!
-
-      // Use a Map to store files, using a unique key (e.g., file.name + file.size + file.lastModified)
-      // This helps in managing individual files and avoids issues with duplicate names if sizes/dates differ.
-      let filesToUpload = new Map();
-
-
-      // Function to render the list of selected files
-      function renderSelectedFiles() {
-          selectedFilesList.empty(); // Clear current display
-
-          if (filesToUpload.size === 0) {
-              selectedFilesList.append('<p class="has-text-grey-light">No file(s) selected.</p>');
-              clearAllFilesButton.hide();
-          } else {
-              clearAllFilesButton.show();
-              filesToUpload.forEach((file, key) => {
-                  const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                  const fileItem = `
-                      <div class="selected-file-item">
-                          <span class="file-name-text">${file.name} (${fileSizeMB} MB)</span>
-                          <button type="button" class="delete-file" data-key="${key}" title="Remove file">
-                              <i class="fas fa-times-circle"></i>
-                          </button>
-                      </div>
-                  `;
-                  selectedFilesList.append(fileItem);
-              });
-          }
-      }
-
-      // Event listener for removing individual files
-      selectedFilesList.on('click', '.delete-file', function() {
-          const keyToRemove = $(this).data('key');
-          filesToUpload.delete(keyToRemove);
-          renderSelectedFiles(); // Re-render the list
-          messageArea.html(''); // Clear any previous messages
-          messageArea.removeClass('is-danger is-success is-warning is-info');
-          // Important: If the file input had a value, it's now out of sync.
-          // For simplicity, we don't try to sync it back, but rely on filesToUpload Map.
-      });
-
-      // Event listener for clearing all files
-      clearAllFilesButton.on('click', function() {
-          filesToUpload.clear();
-          contractFileInput.val(''); // Clear the file input element's value
-          renderSelectedFiles();
-          messageArea.html(''); // Clear any previous messages
-          messageArea.removeClass('is-danger is-success is-warning is-info');
-      });
+            <div class="field mt-5">
+                <div class="control">
+                    <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitSurveyButton">
+                        <span class="icon is-small"><i class="fas fa-paper-plane"></i></span> <span>Submit Answers</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="surveyMessageArea" class="content mt-3"></div>
+    </div>
 
 
-      // Event listener for the main contract file input
-      contractFileInput.on('change', function() {
-          console.log('Main contract file input changed. New files selected:', this.files.length);
-          // Don't clear messageArea here, only on form submit
+    <div id="exampleModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <p class="image">
+                <img src="1.png" alt="Example Financing Terms Page">
+                </p>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-          if (this.files.length > 0) {
-              let allNewFilesValid = true;
-              const newFiles = Array.from(this.files);
+    <script>
+        $(document).ready(function() {
+            const uploadFormContainer = $('#uploadFormContainer'); // New
+            const uploadForm = $('#uploadForm');
+            const emailInput = $('#emailInput');
+            const contractFileInput = $('#contractFile');
+            const selectedFilesList = $('#selectedFilesList'); // Updated: now a container for the list
+            const clearAllFilesButton = $('#clearAllFilesButton'); // New button
+            const messageArea = $('#messageArea');
+            const submitButton = $('#submitButton');
 
-              const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'image/heic', 'image/heif'];
-              const allowedExtensionsRegex = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
-              const maxSizeInBytes = 50 * 1024 * 1024; // 50MB limit per file
-
-              for (const file of newFiles) {
-                  // Create a unique key for the file to store in the Map
-                  const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
-
-                  // Validate MIME type and extension
-                  if (!allowedMimeTypes.includes(file.type) && !allowedExtensionsRegex.test(file.name)) {
-                      messageArea.html(`<div class="notification is-danger">Error: Invalid file type for "${file.name}". Only PDF, PNG, JPG, and HEIC files are accepted.</div>`);
-                      messageArea.addClass('is-danger');
-                      allNewFilesValid = false;
-                      break;
-                  }
-
-                  // Validate file size
-                  if (file.size > maxSizeInBytes) {
-                      messageArea.html(`<div class="notification is-danger">Error: File "${file.name}" is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB per file.</div>`);
-                      messageArea.addClass('is-danger');
-                      allNewFilesValid = false;
-                      break;
-                  }
-
-                  // If valid, add to the Map (will overwrite if same key, which is fine for re-selecting same file)
-                  filesToUpload.set(fileKey, file);
-              }
-
-              if (allNewFilesValid) {
-                  renderSelectedFiles(); // Re-render the list with all accumulated files
-                  messageArea.html(''); // Clear previous error messages if new files are valid
-                  messageArea.removeClass('is-danger');
-              } else {
-                  // If any new file is invalid, clear the input value but keep previously valid files
-                  this.value = ''; // Clear the input so user can re-select
-                  // The invalid file(s) are not added to filesToUpload, so no need to remove them.
-                  // The error message for the invalid file is already set.
-              }
-
-          } else {
-              // If the user opened the picker but selected no new files (or cancelled)
-              // We don't clear filesToUpload here. They might just be closing the picker.
-              // The renderSelectedFiles() will still show existing files.
-              messageArea.html('');
-              messageArea.removeClass('is-danger is-success is-warning is-info');
-          }
-      });
+            // New elements for survey questions
+            const questionsContainer = $('#questionsContainer'); // New
+            const surveyForm = $('#surveyForm'); // New
+            const dealSatisfactionInput = $('#dealSatisfaction'); // New
+            const timeSpentInput = $('#timeSpent'); // New
+            const stressScaleInput = $('#stressScale'); // New
+            const stressScaleOutput = $('#stressScaleOutput'); // New
+            const submitSurveyButton = $('#submitSurveyButton'); // New
+            const surveyMessageArea = $('#surveyMessageArea'); // New
 
 
-      uploadForm.on('submit', function(event) {
-        event.preventDefault();
+            const exampleModal = $('#exampleModal');
+            const viewExampleButton = $('#viewExampleButton');
+            const modalBackground = $('.modal-background');
+            const modalCloseButton = $('.modal-close');
 
-        const emailAddress = emailInput.val().trim();
+            // ONLY ONE SCRIPT URL IS NEEDED NOW
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-qi89_2nktIW--lThd4FjZ9Egp9EXP0Rx2nTrLQp1ROuOgX1Qwgx5fTb70TV8jKCUA/exec"; // REPLACE ME with your *single* script URL
 
-        // --- Frontend Validation Checks ---
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailAddress || !emailRegex.test(emailAddress)) {
-            messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
-            messageArea.addClass('is-warning');
-            emailInput.focus();
-            return;
-        }
-
-        if (filesToUpload.size === 0) { // Check the Map size
-            messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
-            messageArea.addClass('is-warning');
-            contractFileInput.focus();
-            return;
-        }
-        // --- End Frontend Validation Checks ---
+            // Use a Map to store files, using a unique key (e.g., file.name + file.size + file.lastModified)
+            // This helps in managing individual files and avoids issues with duplicate names if sizes/dates differ.
+            let filesToUpload = new Map();
 
 
-        submitButton.addClass('is-loading');
-        messageArea.html('<div class="notification is-info">Reading files and preparing for upload...</div>');
-        messageArea.addClass('is-info');
+            // Function to render the list of selected files
+            function renderSelectedFiles() {
+                selectedFilesList.empty(); // Clear current display
 
-
-        const postData = {
-            emailAddress: emailAddress,
-            files: [] // Array to hold main contract file data objects
-        };
-
-        const filesToRead = Array.from(filesToUpload.values()); // Get all File objects from the Map
-        let filesReadCount = 0;
-        const totalFilesToRead = filesToRead.length;
-
-        const readPromises = filesToRead.map(file => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                       const base64Data = e.target.result.split(',')[1];
-                       const mimeType = file.type || 'application/octet-stream';
-                       const filename = file.name;
-
-                       postData.files.push({
-                           data: base64Data,
-                           mimetype: mimeType,
-                           filename: filename
-                       });
-                       console.log(`Finished reading contract file: "${filename}"`);
-
-                       filesReadCount++;
-                       resolve();
-                    } catch (err) {
-                       console.error('FileReader processing error for file:', file.name, err);
-                       reject(`Error processing file "${file.name}": ${err.message}`);
-                    }
-                };
-                reader.onerror = function(err) {
-                    console.error('FileReader error for file:', file.name, err);
-                    reject(`Failed to read file "${file.name}".`);
-                };
-                console.log(`Starting FileReader for file: "${file.name}"`);
-                reader.readAsDataURL(file);
-            });
-        });
-
-        console.log('Starting Promise.all to read files...');
-
-        Promise.all(readPromises)
-            .then(() => {
-                    console.log('Promise.all resolved (all files read).');
-                    console.log('Object payload before AJAX send (form-urlencoded):', postData);
-
-                    messageArea.html(`<div class="notification is-info">All files read. Sending ${totalFilesToRead} file(s)...</div>`);
-
-                    $.ajax({
-                        url: GOOGLE_SCRIPT_URL_UPLOAD, // Use the upload script URL
-                        type: 'POST',
-                        data: postData,
-                        dataType: 'json',
-                        timeout: 300000, // 5 minutes
-                        success: function(data) {
-                            console.log('AJAX success response:', data);
-                            if (data && data.status === 'success') {
-                                messageArea.html('<div class="notification is-success">Successfully uploaded your files! Please answer a few questions below.</div>');
-                                messageArea.addClass('is-success');
-                                // Instead of resetting the form, hide it and show survey questions
-                                uploadFormContainer.hide();
-                                questionsContainer.show();
-                                emailInput.prop('disabled', true); // Keep email for the survey, but disable editing
-                                filesToUpload.clear(); // Clear files after successful upload
-                                renderSelectedFiles(); // Update display for files
-                            } else {
-                                messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
-                                messageArea.addClass('is-danger');
-                                console.error('Upload Error Response from server:', data);
-                            }
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error('AJAX Error:', textStatus, errorThrown, jqXHR);
-                            let errorMessage = 'Upload failed.';
-
-                            if (textStatus === 'timeout') {
-                                errorMessage += ' The request timed out.';
-                            } else if (jqXHR.status === 0) {
-                                 errorMessage += ' Network error or server did not respond.';
-                            } else if (jqXHR.status === 404) {
-                                 errorMessage += ' Server not found. Check the script URL.';
-                            } else if (jqXHR.status >= 500) {
-                                 errorMessage += ' Server error. Check the Apps Script execution logs.';
-                            } else if (errorThrown === 'parsererror') {
-                                 errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
-                            }
-                             else {
-                                 errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
-                             }
-
-                             if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                                 errorMessage += ' Details: ' + jqXHR.responseJSON.message;
-                             } else if (jqXHR.responseText) {
-                                 try {
-                                     const responseJson = JSON.parse(jqXHR.responseText);
-                                     if(responseJson.message) {
-                                         errorMessage += ' Details: ' + responseJson.message;
-                                     } else {
-                                         const snippet = jqXHR.responseText.substring(0, 200);
-                                         errorMessage += ' Server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
-                                     }
-                                 } catch (e) {
-                                     const snippet = jqXHR.responseText.substring(0, 200);
-                                     errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
-                                 }
-                             }
-
-                            messageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
-                            messageArea.addClass('is-danger');
-                        },
-                        complete: function() {
-                            console.log('AJAX complete.');
-                            submitButton.removeClass('is-loading');
-                        }
+                if (filesToUpload.size === 0) {
+                    selectedFilesList.append('<p class="has-text-grey-light">No file(s) selected.</p>');
+                    clearAllFilesButton.hide();
+                } else {
+                    clearAllFilesButton.show();
+                    filesToUpload.forEach((file, key) => {
+                        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                        const fileItem = `
+                            <div class="selected-file-item">
+                                <span class="file-name-text">${file.name} (${fileSizeMB} MB)</span>
+                                <button type="button" class="delete-file" data-key="${key}" title="Remove file">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                        `;
+                        selectedFilesList.append(fileItem);
                     });
-            })
-            .catch(errorMsg => {
-                console.error('File reading process error caught:', errorMsg);
-                messageArea.html(`<div class="notification is-danger">Error preparing files: ${errorMsg}. Please try selecting files again.</div>`);
-                messageArea.addClass('is-danger');
-                submitButton.removeClass('is-loading');
-            });
-      });
-
-      // --- Survey Form Logic ---
-      // Update stress scale output dynamically
-      stressScaleInput.on('input', function() {
-          stressScaleOutput.text($(this).val());
-      });
-
-      surveyForm.on('submit', function(event) {
-          event.preventDefault();
-
-          const emailAddressForSurvey = emailInput.val().trim(); // Use the email from the upload form
-          const dealSatisfaction = dealSatisfactionInput.val().trim();
-          const timeSpent = timeSpentInput.val(); // Get numerical value directly
-          const stressScale = stressScaleInput.val(); // Get numerical value directly
-
-          // Basic validation for survey questions (optional, but good practice)
-          if (!dealSatisfaction && !timeSpent && !stressScale) {
-              surveyMessageArea.html('<div class="notification is-warning">Please answer at least one question before submitting.</div>');
-              surveyMessageArea.addClass('is-warning');
-              return;
-          }
-
-          // More specific validation for timeSpent if it's required to be a valid number
-          if (timeSpent !== '' && (isNaN(timeSpent) || parseFloat(timeSpent) < 0)) {
-              surveyMessageArea.html('<div class="notification is-warning">Please enter a valid number for hours spent (0 or more).</div>');
-              surveyMessageArea.addClass('is-warning');
-              timeSpentInput.focus();
-              return;
-          }
-
-          submitSurveyButton.addClass('is-loading');
-          surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
-          surveyMessageArea.addClass('is-info');
-
-          const surveyData = {
-              emailAddress: emailAddressForSurvey,
-              dealSatisfaction: dealSatisfaction,
-              timeSpentHours: timeSpent !== '' ? parseFloat(timeSpent) : null, // Store as number or null if empty
-              stressScale: parseInt(stressScale) // Store as integer
-          };
-
-          console.log('Survey data payload:', surveyData);
-
-          $.ajax({
-              url: GOOGLE_SCRIPT_URL_SURVEY, // Use the new survey script URL
-              type: 'POST',
-              data: surveyData,
-              dataType: 'json',
-              timeout: 60000, // 1 minute timeout for survey submission
-              success: function(data) {
-                  console.log('Survey AJAX success response:', data);
-                  if (data && data.status === 'success') {
-                      surveyMessageArea.html('<div class="notification is-success">Thank you! Your feedback has been submitted.</div>');
-                      surveyMessageArea.addClass('is-success');
-                      surveyForm[0].reset(); // Reset survey form fields
-                      stressScaleOutput.text(stressScaleInput.val()); // Reset slider output
-                      // Optionally, you could hide the survey form again or redirect the user
-                      // For now, just show the success message.
-                  } else {
-                      surveyMessageArea.html(`<div class="notification is-danger">Submission failed: ${data ? (data.message || 'Unknown error during submission.') : 'Invalid response from server.'}</div>`);
-                      surveyMessageArea.addClass('is-danger');
-                      console.error('Survey Submission Error Response from server:', data);
-                  }
-              },
-              error: function(jqXHR, textStatus, errorThrown) {
-                  console.error('Survey AJAX Error:', textStatus, errorThrown, jqXHR);
-                  let errorMessage = 'Submission failed.';
-                  if (textStatus === 'timeout') {
-                      errorMessage += ' The request timed out.';
-                  } else {
-                       errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
-                  }
-                  surveyMessageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
-                  surveyMessageArea.addClass('is-danger');
-              },
-              complete: function() {
-                  console.log('Survey AJAX complete.');
-                  submitSurveyButton.removeClass('is-loading');
-              }
-          });
-      });
-
-
-      // --- JavaScript to control the modal ---
-      viewExampleButton.on('click', function() {
-          exampleModal.addClass('is-active');
-      });
-
-      modalBackground.on('click', function() {
-          exampleModal.removeClass('is-active');
-      });
-
-        modalCloseButton.on('click', function() {
-          exampleModal.removeClass('is-active');
-        });
-
-        $(document).on('keydown', function(event) {
-            if (event.key === "Escape") {
-                exampleModal.removeClass('is-active');
+                }
             }
-        });
-      // --- End JavaScript to control the modal ---
 
-      // Initial render when the page loads
-      renderSelectedFiles();
-    });
-  </script>
+            // Event listener for removing individual files
+            selectedFilesList.on('click', '.delete-file', function() {
+                const keyToRemove = $(this).data('key');
+                filesToUpload.delete(keyToRemove);
+                renderSelectedFiles(); // Re-render the list
+                messageArea.html(''); // Clear any previous messages
+                messageArea.removeClass('is-danger is-success is-warning is-info');
+                // Important: If the file input had a value, it's now out of sync.
+                // For simplicity, we don't try to sync it back, but rely on filesToUpload Map.
+            });
+
+            // Event listener for clearing all files
+            clearAllFilesButton.on('click', function() {
+                filesToUpload.clear();
+                contractFileInput.val(''); // Clear the file input element's value
+                renderSelectedFiles();
+                messageArea.html(''); // Clear any previous messages
+                messageArea.removeClass('is-danger is-success is-warning is-info');
+            });
+
+
+            // Event listener for the main contract file input
+            contractFileInput.on('change', function() {
+                console.log('Main contract file input changed. New files selected:', this.files.length);
+                // Don't clear messageArea here, only on form submit
+
+                if (this.files.length > 0) {
+                    let allNewFilesValid = true;
+                    const newFiles = Array.from(this.files);
+
+                    const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'image/heic', 'image/heif'];
+                    const allowedExtensionsRegex = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
+                    const maxSizeInBytes = 50 * 1024 * 1024; // 50MB limit per file
+
+                    for (const file of newFiles) {
+                        // Create a unique key for the file to store in the Map
+                        const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
+
+                        // Validate MIME type and extension
+                        if (!allowedMimeTypes.includes(file.type) && !allowedExtensionsRegex.test(file.name)) {
+                            messageArea.html(`<div class="notification is-danger">Error: Invalid file type for "${file.name}". Only PDF, PNG, JPG, and HEIC files are accepted.</div>`);
+                            messageArea.addClass('is-danger');
+                            allNewFilesValid = false;
+                            break;
+                        }
+
+                        // Validate file size
+                        if (file.size > maxSizeInBytes) {
+                            messageArea.html(`<div class="notification is-danger">Error: File "${file.name}" is too large. Maximum size is ${maxSizeInBytes / (1024*1024)}MB per file.</div>`);
+                            messageArea.addClass('is-danger');
+                            allNewFilesValid = false;
+                            break;
+                        }
+
+                        // If valid, add to the Map (will overwrite if same key, which is fine for re-selecting same file)
+                        filesToUpload.set(fileKey, file);
+                    }
+
+                    if (allNewFilesValid) {
+                        renderSelectedFiles(); // Re-render the list with all accumulated files
+                        messageArea.html(''); // Clear previous error messages if new files are valid
+                        messageArea.removeClass('is-danger');
+                    } else {
+                        // If any new file is invalid, clear the input value but keep previously valid files
+                        this.value = ''; // Clear the input so user can re-select
+                        // The invalid file(s) are not added to filesToUpload, so no need to remove them.
+                        // The error message for the invalid file is already set.
+                    }
+
+                } else {
+                    // If the user opened the picker but selected no new files (or cancelled)
+                    // We don't clear filesToUpload here. They might just be closing the picker.
+                    // The renderSelectedFiles() will still show existing files.
+                    messageArea.html('');
+                    messageArea.removeClass('is-danger is-success is-warning is-info');
+                }
+            });
+
+
+            uploadForm.on('submit', function(event) {
+                event.preventDefault();
+
+                const emailAddress = emailInput.val().trim();
+
+                // --- Frontend Validation Checks ---
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailAddress || !emailRegex.test(emailAddress)) {
+                    messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
+                    messageArea.addClass('is-warning');
+                    emailInput.focus();
+                    return;
+                }
+
+                if (filesToUpload.size === 0) { // Check the Map size
+                    messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
+                    messageArea.addClass('is-warning');
+                    contractFileInput.focus();
+                    return;
+                }
+                // --- End Frontend Validation Checks ---
+
+
+                submitButton.addClass('is-loading');
+                messageArea.html('<div class="notification is-info">Reading files and preparing for upload...</div>');
+                messageArea.addClass('is-info');
+
+
+                const postData = {
+                    type: 'contract_upload', // Indicate this is a contract upload
+                    emailAddress: emailAddress,
+                    files: [] // Array to hold main contract file data objects
+                };
+
+                const filesToRead = Array.from(filesToUpload.values()); // Get all File objects from the Map
+                let filesReadCount = 0;
+                const totalFilesToRead = filesToRead.length;
+
+                const readPromises = filesToRead.map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                               const base64Data = e.target.result.split(',')[1];
+                               const mimeType = file.type || 'application/octet-stream';
+                               const filename = file.name;
+
+                               postData.files.push({
+                                   data: base64Data,
+                                   mimetype: mimeType,
+                                   filename: filename
+                               });
+                               console.log(`Finished reading contract file: "${filename}"`);
+
+                               filesReadCount++;
+                               resolve();
+                            } catch (err) {
+                               console.error('FileReader processing error for file:', file.name, err);
+                               reject(`Error processing file "${file.name}": ${err.message}`);
+                            }
+                        };
+                        reader.onerror = function(err) {
+                            console.error('FileReader error for file:', file.name, err);
+                            reject(`Failed to read file "${file.name}".`);
+                        };
+                        console.log(`Starting FileReader for file: "${file.name}"`);
+                        reader.readAsDataURL(file);
+                    });
+                });
+
+                console.log('Starting Promise.all to read files...');
+
+                Promise.all(readPromises)
+                    .then(() => {
+                        console.log('Promise.all resolved (all files read).');
+                        console.log('Object payload before AJAX send (form-urlencoded):', postData);
+
+                        messageArea.html(`<div class="notification is-info">All files read. Sending ${totalFilesToRead} file(s)...</div>`);
+
+                        $.ajax({
+                            url: GOOGLE_SCRIPT_URL, // Now using the single URL
+                            type: 'POST',
+                            data: postData,
+                            dataType: 'json',
+                            timeout: 300000, // 5 minutes
+                            success: function(data) {
+                                console.log('AJAX success response:', data);
+                                if (data && data.status === 'success') {
+                                    messageArea.html('<div class="notification is-success">Successfully uploaded your files! Please answer a few questions below.</div>');
+                                    messageArea.addClass('is-success');
+                                    // Instead of resetting the form, hide it and show survey questions
+                                    uploadFormContainer.hide();
+                                    questionsContainer.show();
+                                    emailInput.prop('disabled', true); // Keep email for the survey, but disable editing
+                                    filesToUpload.clear(); // Clear files after successful upload
+                                    renderSelectedFiles(); // Update display for files
+                                } else {
+                                    messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
+                                    messageArea.addClass('is-danger');
+                                    console.error('Upload Error Response from server:', data);
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.error('AJAX Error:', textStatus, errorThrown, jqXHR);
+                                let errorMessage = 'Upload failed.';
+
+                                if (textStatus === 'timeout') {
+                                    errorMessage += ' The request timed out.';
+                                } else if (jqXHR.status === 0) {
+                                     errorMessage += ' Network error or server did not respond.';
+                                } else if (jqXHR.status === 404) {
+                                     errorMessage += ' Server not found. Check the script URL.';
+                                } else if (jqXHR.status >= 500) {
+                                     errorMessage += ' Server error. Check the Apps Script execution logs.';
+                                } else if (errorThrown === 'parsererror') {
+                                     errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
+                                }
+                                 else {
+                                     errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                                }
+
+                                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                                     errorMessage += ' Details: ' + jqXHR.responseJSON.message;
+                                 } else if (jqXHR.responseText) {
+                                     try {
+                                         const responseJson = JSON.parse(jqXHR.responseText);
+                                         if(responseJson.message) {
+                                             errorMessage += ' Details: ' + responseJson.message;
+                                         } else {
+                                             const snippet = jqXHR.responseText.substring(0, 200);
+                                             errorMessage += ' Server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                         }
+                                     } catch (e) {
+                                         const snippet = jqXHR.responseText.substring(0, 200);
+                                         errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                     }
+                                 }
+
+                                messageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
+                                messageArea.addClass('is-danger');
+                            },
+                            complete: function() {
+                                console.log('AJAX complete.');
+                                submitButton.removeClass('is-loading');
+                            }
+                        });
+                    })
+                    .catch(errorMsg => {
+                        console.error('File reading process error caught:', errorMsg);
+                        messageArea.html(`<div class="notification is-danger">Error preparing files: ${errorMsg}. Please try selecting files again.</div>`);
+                        messageArea.addClass('is-danger');
+                        submitButton.removeClass('is-loading');
+                    });
+            });
+
+            // --- Survey Form Logic ---
+            // Update stress scale output dynamically
+            stressScaleInput.on('input', function() {
+                stressScaleOutput.text($(this).val());
+            });
+
+            surveyForm.on('submit', function(event) {
+                event.preventDefault();
+
+                const emailAddressForSurvey = emailInput.val().trim(); // Use the email from the upload form
+                const dealSatisfaction = dealSatisfactionInput.val().trim();
+                const timeSpent = timeSpentInput.val(); // Get numerical value directly
+                const stressScale = stressScaleInput.val(); // Get numerical value directly
+
+                // Basic validation for survey questions (optional, but good practice)
+                if (!dealSatisfaction && !timeSpent && !stressScale) {
+                    surveyMessageArea.html('<div class="notification is-warning">Please answer at least one question before submitting.</div>');
+                    surveyMessageArea.addClass('is-warning');
+                    return;
+                }
+
+                // More specific validation for timeSpent if it's required to be a valid number
+                if (timeSpent !== '' && (isNaN(timeSpent) || parseFloat(timeSpent) < 0)) {
+                    surveyMessageArea.html('<div class="notification is-warning">Please enter a valid number for hours spent (0 or more).</div>');
+                    surveyMessageArea.addClass('is-warning');
+                    timeSpentInput.focus();
+                    return;
+                }
+
+                submitSurveyButton.addClass('is-loading');
+                surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
+                surveyMessageArea.addClass('is-info');
+
+                const surveyData = {
+                    type: 'survey_submission', // IMPORTANT: Indicate this is a survey submission
+                    emailAddress: emailAddressForSurvey,
+                    dealSatisfaction: dealSatisfaction,
+                    timeSpentHours: timeSpent !== '' ? parseFloat(timeSpent) : null, // Store as number or null if empty
+                    stressScale: parseInt(stressScale) // Store as integer
+                };
+
+                console.log('Survey data payload:', surveyData);
+
+                $.ajax({
+                    url: GOOGLE_SCRIPT_URL, // Now using the single URL for survey
+                    type: 'POST',
+                    data: surveyData,
+                    dataType: 'json',
+                    timeout: 60000, // 1 minute timeout for survey submission
+                    success: function(data) {
+                        console.log('Survey AJAX success response:', data);
+                        if (data && data.status === 'success') {
+                            surveyMessageArea.html('<div class="notification is-success">Thank you! Your feedback has been submitted.</div>');
+                            surveyMessageArea.addClass('is-success');
+                            surveyForm[0].reset(); // Reset survey form fields
+                            stressScaleOutput.text(stressScaleInput.val()); // Reset slider output
+                            // Optionally, you could hide the survey form again or redirect the user
+                            // For now, just show the success message.
+                        } else {
+                            surveyMessageArea.html(`<div class="notification is-danger">Submission failed: ${data ? (data.message || 'Unknown error during submission.') : 'Invalid response from server.'}</div>`);
+                            surveyMessageArea.addClass('is-danger');
+                            console.error('Survey Submission Error Response from server:', data);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Survey AJAX Error:', textStatus, errorThrown, jqXHR);
+                        let errorMessage = 'Submission failed.';
+                        if (textStatus === 'timeout') {
+                            errorMessage += ' The request timed out.';
+                        } else {
+                               errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                        }
+                        surveyMessageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
+                        surveyMessageArea.addClass('is-danger');
+                    },
+                    complete: function() {
+                        console.log('Survey AJAX complete.');
+                        submitSurveyButton.removeClass('is-loading');
+                    }
+                });
+            });
+
+
+            // Modal functionality
+            viewExampleButton.on('click', function() {
+                exampleModal.addClass('is-active');
+            });
+
+            modalBackground.on('click', function() {
+                exampleModal.removeClass('is-active');
+            });
+
+            modalCloseButton.on('click', function() {
+                exampleModal.removeClass('is-active');
+            });
+
+            // Initial render of selected files list
+            renderSelectedFiles();
+        });
+    </script>
 </body>
 </html>
