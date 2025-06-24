@@ -497,7 +497,7 @@
                 messageArea.addClass('is-info');
 
                 const postData = {
-                    type: 'contract_upload', // Indicate this is a contract upload
+                    submissionType: 'contract_upload', // <-- ADDED THIS LINE for contract upload
                     emailAddress: emailAddress,
                     files: [] // Array to hold main contract file data objects
                 };
@@ -647,7 +647,7 @@
                 }
 
                 const surveyPayload = {
-                    type: 'survey_submission', // Indicate this is a survey submission
+                    submissionType: 'survey_submission', // <-- ADDED THIS LINE for survey submission
                     emailAddress: emailAddressForSurvey,
                     dealSatisfaction: dealSatisfaction,
                     timeSpent: timeSpent,
@@ -667,29 +667,58 @@
                             surveyMessageArea.html('<div class="notification is-success">Thank you for your feedback!</div>');
                             surveyMessageArea.addClass('is-success');
                             surveyForm[0].reset(); // Reset survey form
-                            emailInput.prop('disabled', false); // Re-enable email for next use
-                            uploadFormContainer.show(); // Show upload form again if needed
-                            questionsContainer.hide(); // Hide survey questions
+                            // Optionally hide survey form and show a final thank you message or link
                         } else {
-                            surveyMessageArea.html(`<div class="notification is-danger">Survey submission failed: ${response ? (response.message || 'Unknown error.') : 'Invalid response from server.'}</div>`);
+                            surveyMessageArea.html(`<div class="notification is-danger">Survey submission failed: ${response ? (response.message || 'Unknown error during submission.') : 'Invalid response from server.'}</div>`);
                             surveyMessageArea.addClass('is-danger');
                             console.error('Survey Error Response from server:', response);
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error('Survey AJAX Error:', textStatus, errorThrown, jqXHR);
-                        submitSurveyButton.removeClass('is-loading'); // Re-enable button
-                        let errorMessage = 'Survey submission failed: Network error or server did not respond.';
+                        let errorMessage = 'Survey submission failed.';
+
+                        if (textStatus === 'timeout') {
+                            errorMessage += ' The request timed out.';
+                        } else if (jqXHR.status === 0) {
+                            errorMessage += ' Network error or server did not respond.';
+                        } else if (jqXHR.status === 404) {
+                            errorMessage += ' Server not found. Check the script URL.';
+                        } else if (jqXHR.status >= 500) {
+                            errorMessage += ' Server error. Check the Apps Script execution logs.';
+                        } else if (errorThrown === 'parsererror') {
+                            errorMessage += ' Server returned invalid data. Check Apps Script logs for errors.';
+                        } else {
+                            errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
+                        }
+
                         if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                             errorMessage += ' Details: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            try {
+                                const responseJson = JSON.parse(jqXHR.responseText);
+                                if(responseJson.message) {
+                                    errorMessage += ' Details: ' + responseJson.message;
+                                } else {
+                                    const snippet = jqXHR.responseText.substring(0, 200);
+                                    errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                                }
+                            } catch (e) {
+                                const snippet = jqXHR.responseText.substring(0, 200);
+                                errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                            }
                         }
+
                         surveyMessageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
                         surveyMessageArea.addClass('is-danger');
+                    },
+                    complete: function() {
+                        submitSurveyButton.removeClass('is-loading');
                     }
                 });
             });
 
-            // --- Modal Logic ---
+            // --- Modal Logic for Example Page ---
             viewExampleButton.on('click', function() {
                 exampleModal.addClass('is-active');
             });
@@ -702,7 +731,7 @@
                 exampleModal.removeClass('is-active');
             });
 
-            // Initial render of selected files list (should be empty initially)
+            // Initial render of selected files (should be empty on load)
             renderSelectedFiles();
         });
     </script>
