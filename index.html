@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         :root {
-            --custom-primary-color: #00693e; /* Example: Dartmouth Green */
+            --custom-primary-color: #00693e; 
             --custom-light-bg: #f8f8f8;
         }
         body {
@@ -20,7 +20,7 @@
             align-items: center;
             min-height: 100vh;
         }
-        .form-upload-container, .questions-container { /* Apply styling to both containers */
+        .form-upload-container, .questions-container { 
             max-width: 600px;
             width: 100%;
             margin: 30px auto;
@@ -57,14 +57,14 @@
             margin-bottom: 25px;
         }
 
-        /* Updated styling for the file list display */
+        
         #selectedFilesList {
             margin-top: 10px;
             border: 1px solid #dbdbdb;
             border-radius: 4px;
             background-color: #fff;
             padding: 10px;
-            min-height: 40px; /* Ensure it's visible even if empty */
+            min-height: 40px; 
             box-sizing: border-box;
         }
 
@@ -82,13 +82,13 @@
         }
         .selected-file-item .file-name-text {
             flex-grow: 1;
-            word-break: break-all; /* Ensure long filenames wrap */
+            word-break: break-all; 
             margin-right: 10px;
         }
         .selected-file-item .delete-file {
             background: none;
             border: none;
-            color: #ff3860; /* Bulma danger color */
+            color: #ff3860; 
             cursor: pointer;
             font-size: 1.1em;
             padding: 0 5px;
@@ -106,7 +106,7 @@
         }
 
         #messageArea .notification {
-            margin-bottom: 0; /* Prevent double margin with Bulma's default */
+            margin-bottom: 0; 
         }
 
         .button.is-primary-custom {
@@ -118,10 +118,10 @@
             background-color: #005a34;
         }
 
-        /* Style for the example button */
+        
         .example-button-container {
-            margin-bottom: 25px; /* Space after instructions */
-            text-align: center; /* Center the button */
+            margin-bottom: 25px; 
+            text-align: center; 
         }
 
         .file-actions {
@@ -131,7 +131,7 @@
             margin-top: 10px;
         }
 
-        /* Style for the range input */
+        
         .range-input-container {
             display: flex;
             align-items: center;
@@ -143,7 +143,7 @@
         }
         .range-input-container output {
             font-weight: bold;
-            min-width: 30px; /* Ensure space for two-digit numbers */
+            min-width: 30px; 
             text-align: right;
         }
 
@@ -158,17 +158,17 @@
             }
             .hero .title {
                 font-size: 1.8em;
-                margin-left: 1rem; /* Adjusted for smaller screens */
+                margin-left: 1rem; 
             }
             .hero-body .container {
-                flex-direction: column; /* Stack logo and title on small screens */
+                flex-direction: column; 
                 text-align: center;
             }
             .banner-logo {
-                margin-bottom: 10px; /* Space between logo and title */
+                margin-bottom: 10px; 
             }
             .hero .title {
-                margin-left: 0; /* Center title */
+                margin-left: 0; 
             }
         }
     </style>
@@ -301,36 +301,47 @@
             <div class="field">
                 <label class="label" for="dealSatisfaction">Overall, how satisfied are you with your car purchase deal?</label>
                 <div class="control">
-                    <textarea class="textarea" id="dealSatisfaction" placeholder="e.g., I feel I got a fair price, or I was pressured into extras." rows="3"></textarea>
+                    <textarea class="textarea" id="dealSatisfaction" placeholder="" rows="3" required></textarea>
                 </div>
             </div>
 
             <div class="field">
                 <label class="label" for="timeSpent">Approximately how many hours did you spend on the car purchase process (including research, dealership visits, paperwork, etc.)?</label>
                 <div class="control">
-                    <input class="input" type="number" id="timeSpent" min="0" step="0.5" placeholder="e.g., 10.5">
+                    <input class="input" type="number" id="timeSpent" min="0" step="0.5" placeholder="" required>
                 </div>
             </div>
 
-            <div class="field">
-                <label class="label" for="stressScale">On a scale of 1 to 10 (1 = Not at all stressful, 10 = Extremely stressful), how stressful was the car buying process for you?</label>
-                <div class="control range-input-container">
-                    <input type="range" id="stressScale" min="1" max="10" value="0">
-                    <output for="stressScale" id="stressScaleOutput">0</output>
+                        <div class="field">
+                <label class="label" for="stressScaleHidden">On a scale of 1 to 10 (1 = Not at all stressful, 10 = Extremely stressful), how stressful was the car buying process for you?</label>
+                <div class="control">
+                    <div class="buttons has-addons is-centered" id="stressScaleButtonsContainer" style="flex-wrap: wrap;">
+                        <button class="button" data-value="1">1</button>
+                        <button class="button" data-value="2">2</button>
+                        <button class="button" data-value="3">3</button>
+                        <button class="button" data-value="4">4</button>
+                        <button class="button" data-value="5">5</button>
+                        <button class="button" data-value="6">6</button>
+                        <button class="button" data-value="7">7</button>
+                        <button class="button" data-value="8">8</button>
+                        <button class="button" data-value="9">9</button>
+                        <button class="button" data-value="10">10</button>
+                    </div>
+                    <input type="hidden" id="stressScaleHidden" value="0">
                 </div>
             </div>
             
             <div class="field">
                 <label class="label" for="numDealersPriceQuote">How many dealers did you get a car price quote from?</label>
                 <div class="control">
-                    <input class="input" type="number" id="numDealersPriceQuote" min="0" step="1" placeholder="e.g., 3">
+                    <input class="input" type="number" id="numDealersPriceQuote" min="0" step="1" placeholder="" required>
                 </div>
             </div>
 
             <div class="field">
                 <label class="label" for="numDealersFinancingQuote">How many dealers did you get a financing quote from?</label>
                 <div class="control">
-                    <input class="input" type="number" id="numDealersFinancingQuote" min="0" step="1" placeholder="e.g., 2">
+                    <input class="input" type="number" id="numDealersFinancingQuote" min="0" step="1" placeholder="" required>
                 </div>
             </div>
             
@@ -373,8 +384,8 @@
             const surveyForm = $('#surveyForm');
             const dealSatisfactionInput = $('#dealSatisfaction');
             const timeSpentInput = $('#timeSpent');
-            const stressScaleInput = $('#stressScale');
-            const stressScaleOutput = $('#stressScaleOutput');
+            const stressScaleButtonsContainer = $('#stressScaleButtonsContainer');
+            const stressScaleHiddenInput = $('#stressScaleHidden');
             const numDealersPriceQuoteInput = $('#numDealersPriceQuote');
             const numDealersFinancingQuoteInput = $('#numDealersFinancingQuote');
             const submitSurveyButton = $('#submitSurveyButton');
@@ -386,16 +397,16 @@
             const modalBackground = $('.modal-background');
             const modalCloseButton = $('.modal-close');
 
-            // IMPORTANT: Replace this with your actual deployed Google Apps Script URL
+           
             const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbdFSE6SV8AIJfPJBG15nrKhNWPk8dsSdelEGWX7a-YsnyRUfem_PQlaV4Wn1sG5crEA/exec";
 
-            // Use a Map to store files, using a unique key (e.g., file.name + file.size + file.lastModified)
+            
             let filesToUpload = new Map();
+            let stressScaleInteracted = false;
 
-
-            // Function to render the list of selected files
+           
             function renderSelectedFiles() {
-                selectedFilesList.empty(); // Clear current display
+                selectedFilesList.empty(); 
 
                 if (filesToUpload.size === 0) {
                     selectedFilesList.append('<p class="has-text-grey-light">No file(s) selected.</p>');
@@ -417,39 +428,39 @@
                 }
             }
 
-            // Event listener for removing individual files
+           
             selectedFilesList.on('click', '.delete-file', function() {
                 const keyToRemove = $(this).data('key');
                 filesToUpload.delete(keyToRemove);
-                renderSelectedFiles(); // Re-render the list
-                messageArea.html(''); // Clear any previous messages
+                renderSelectedFiles(); 
+                messageArea.html(''); 
                 messageArea.removeClass('is-danger is-success is-warning is-info');
             });
 
-            // Event listener for clearing all files
+            
             clearAllFilesButton.on('click', function() {
                 filesToUpload.clear();
-                contractFileInput.val(''); // Clear the file input element's value
+                contractFileInput.val(''); 
                 renderSelectedFiles();
-                messageArea.html(''); // Clear any previous messages
+                messageArea.html(''); 
                 messageArea.removeClass('is-danger is-success is-warning is-info');
             });
 
 
-            // Event listener for the main contract file input
+            
             contractFileInput.on('change', function() {
                 console.log('Main contract file input changed. New files selected:', this.files.length);
-                messageArea.html(''); // Clear previous error messages when new files are selected
+                messageArea.html(''); 
                 messageArea.removeClass('is-danger is-success is-warning is-info');
 
                 if (this.files.length > 0) {
                     let allNewFilesValid = true;
                     const newFiles = Array.from(this.files);
 
-                    // Added image/heic, image/heif for HEIC support
+                   
                     const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg', 'image/heic', 'image/heif'];
                     const allowedExtensionsRegex = /\.(pdf|png|jpg|jpeg|heic|heif)$/i;
-                    const maxSizeInBytes = 50 * 1024 * 1024; // 50MB limit per file
+                    const maxSizeInBytes = 50 * 1024 * 1024; 
 
                     for (const file of newFiles) {
                         const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
@@ -475,13 +486,12 @@
                         messageArea.html('');
                         messageArea.removeClass('is-danger');
                     } else {
-                        // If any new file is invalid, clear the input value but keep previously valid files
-                        this.value = ''; // Clear the input so user can re-select
+                        
+                        this.value = ''; 
                     }
 
                 } else {
-                    // If the user opened the picker but selected no new files (or cancelled)
-                    // We don't clear filesToUpload here. They might just be closing the picker.
+                   
                     messageArea.html('');
                     messageArea.removeClass('is-danger is-success is-warning is-info');
                 }
@@ -513,9 +523,9 @@
                 messageArea.addClass('is-info');
 
                 const postData = {
-                    submissionType: 'contract_upload', // <-- ADDED THIS LINE for contract upload
+                    submissionType: 'contract_upload', 
                     emailAddress: emailAddress,
-                    files: [] // Array to hold main contract file data objects
+                    files: [] 
                 };
 
                 const filesToRead = Array.from(filesToUpload.values());
@@ -567,7 +577,7 @@
                             type: 'POST',
                             data: postData,
                             dataType: 'json',
-                            timeout: 300000, // 5 minutes
+                            timeout: 300000, 
                             success: function(data) {
                                 console.log('AJAX success response:', data);
                                 if (data && data.status === 'success') {
@@ -575,9 +585,9 @@
                                     messageArea.addClass('is-success');
                                     uploadFormContainer.hide();
                                     questionsContainer.show();
-                                    emailInput.prop('disabled', true); // Keep email for the survey, but disable editing
-                                    filesToUpload.clear(); // Clear files after successful upload
-                                    renderSelectedFiles(); // Update display for files
+                                    emailInput.prop('disabled', true);  editing
+                                    filesToUpload.clear();
+                                    renderSelectedFiles(); 
                                 } else {
                                     messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
                                     messageArea.addClass('is-danger');
@@ -636,7 +646,7 @@
                     });
             });
 
-            // --- Survey Form Logic ---
+            
             stressScaleInput.on('input', function() {
                 stressScaleOutput.text($(this).val());
             });
@@ -644,7 +654,7 @@
             surveyForm.on('submit', function(event) {
                 event.preventDefault();
 
-                // Show loading indicator
+                
                 submitSurveyButton.addClass('is-loading');
                 surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
                 surveyMessageArea.addClass('is-info');
@@ -654,7 +664,7 @@
                 const timeSpent = timeSpentInput.val();
                 const stressScale = stressScaleInput.val();
 
-                // Basic validation for survey questions (optional, but good practice)
+                
                 if (!dealSatisfaction && !timeSpent && !stressScale) {
                     surveyMessageArea.html('<div class="notification is-warning">Please answer at least one question before submitting.</div>');
                     surveyMessageArea.addClass('is-warning');
@@ -663,7 +673,7 @@
                 }
 
                 const surveyPayload = {
-                    submissionType: 'survey_submission', // <-- ADDED THIS LINE for survey submission
+                    submissionType: 'survey_submission', 
                     emailAddress: emailAddressForSurvey,
                     dealSatisfaction: dealSatisfaction,
                     timeSpent: timeSpent,
@@ -679,13 +689,12 @@
                     dataType: 'json',
                     success: function(response) {
                         console.log('Survey AJAX success response:', response);
-                        submitSurveyButton.removeClass('is-loading'); // Re-enable button
+                        submitSurveyButton.removeClass('is-loading'); 
 
                         if (response && response.status === 'success') {
                             surveyMessageArea.html('<div class="notification is-success">Thank you for your feedback!</div>');
                             surveyMessageArea.addClass('is-success');
-                            surveyForm[0].reset(); // Reset survey form
-                            // Optionally hide survey form and show a final thank you message or link
+                            surveyForm[0].reset(); 
                         } else {
                             surveyMessageArea.html(`<div class="notification is-danger">Survey submission failed: ${response ? (response.message || 'Unknown error during submission.') : 'Invalid response from server.'}</div>`);
                             surveyMessageArea.addClass('is-danger');
@@ -736,7 +745,7 @@
                 });
             });
 
-            // --- Modal Logic for Example Page ---
+            
             viewExampleButton.on('click', function() {
                 exampleModal.addClass('is-active');
             });
@@ -749,7 +758,7 @@
                 exampleModal.removeClass('is-active');
             });
 
-            // Initial render of selected files (should be empty on load)
+            
             renderSelectedFiles();
         });
     </script>
