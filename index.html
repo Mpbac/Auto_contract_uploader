@@ -319,7 +319,21 @@
                     <output for="stressScale" id="stressScaleOutput">0</output>
                 </div>
             </div>
+            
+            <div class="field">
+                <label class="label" for="numDealersPriceQuote">How many dealers did you get a car price quote from?</label>
+                <div class="control">
+                    <input class="input" type="number" id="numDealersPriceQuote" min="0" step="1" placeholder="e.g., 3">
+                </div>
+            </div>
 
+            <div class="field">
+                <label class="label" for="numDealersFinancingQuote">How many dealers did you get a financing quote from?</label>
+                <div class="control">
+                    <input class="input" type="number" id="numDealersFinancingQuote" min="0" step="1" placeholder="e.g., 2">
+                </div>
+            </div>
+            
             <div class="field mt-5">
                 <div class="control">
                     <button class="button is-primary-custom is-fullwidth is-medium" type="submit" id="submitSurveyButton">
@@ -361,6 +375,8 @@
             const timeSpentInput = $('#timeSpent');
             const stressScaleInput = $('#stressScale');
             const stressScaleOutput = $('#stressScaleOutput');
+            const numDealersPriceQuoteInput = $('#numDealersPriceQuote');
+            const numDealersFinancingQuoteInput = $('#numDealersFinancingQuote');
             const submitSurveyButton = $('#submitSurveyButton');
             const surveyMessageArea = $('#surveyMessageArea');
 
@@ -651,7 +667,9 @@
                     emailAddress: emailAddressForSurvey,
                     dealSatisfaction: dealSatisfaction,
                     timeSpent: timeSpent,
-                    stressScale: stressScale
+                    stressScale: stressScale,
+                    numDealersPriceQuote: numDealersPriceQuoteInput.val(),    
+                    numDealersFinancingQuote: numDealersFinancingQuoteInput.val() 
                 };
 
                 $.ajax({
