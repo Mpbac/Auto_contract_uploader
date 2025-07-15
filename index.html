@@ -647,14 +647,25 @@
             });
 
             
-            stressScaleInput.on('input', function() {
-                stressScaleOutput.text($(this).val());
+            stressScaleButtonsContainer.on('click', '.button', function() {
+                // Remove 'is-primary-custom' class from all buttons
+                stressScaleButtonsContainer.find('.button').removeClass('is-primary-custom');
+
+                // Add 'is-primary-custom' class to the clicked button
+                $(this).addClass('is-primary-custom');
+
+                // Set the value of the hidden input
+                const selectedValue = $(this).data('value');
+                stressScaleHiddenInput.val(selectedValue);
+                stressScaleInteracted = true; // Mark as interacted
+
+                console.log('Stress Scale selected:', selectedValue);
             });
 
-            surveyForm.on('submit', function(event) {
+           surveyForm.on('submit', function(event) {
                 event.preventDefault();
 
-                
+                // Show loading indicator
                 submitSurveyButton.addClass('is-loading');
                 surveyMessageArea.html('<div class="notification is-info">Submitting your answers...</div>');
                 surveyMessageArea.addClass('is-info');
@@ -662,24 +673,68 @@
                 const emailAddressForSurvey = emailInput.val().trim(); // Get email from the first form
                 const dealSatisfaction = dealSatisfactionInput.val().trim();
                 const timeSpent = timeSpentInput.val();
-                const stressScale = stressScaleInput.val();
+                // NEW: Get stress scale value from the hidden input
+                const stressScale = stressScaleHiddenInput.val();
 
-                
-                if (!dealSatisfaction && !timeSpent && !stressScale) {
-                    surveyMessageArea.html('<div class="notification is-warning">Please answer at least one question before submitting.</div>');
+
+                // Custom validation to ensure all required fields are filled
+                if (!dealSatisfaction) {
+                    surveyMessageArea.html('<div class="notification is-warning">Please tell us about your deal satisfaction.</div>');
                     surveyMessageArea.addClass('is-warning');
                     submitSurveyButton.removeClass('is-loading');
                     return;
                 }
 
+                if (timeSpent === '' || isNaN(timeSpent) || parseFloat(timeSpent) < 0) {
+                     surveyMessageArea.html('<div class="notification is-warning">Please enter a valid time spent (in hours).</div>');
+                     surveyMessageArea.addClass('is-warning');
+                     submitSurveyButton.removeClass('is-loading');
+                     return;
+                }
+
+                const numDealersPriceQuote = $('#numDealersPriceQuote').val(); // Ensure these are correctly referenced if not already constants
+                if (numDealersPriceQuote === '' || isNaN(numDealersPriceQuote) || parseInt(numDealersPriceQuote) < 0) {
+                     surveyMessageArea.html('<div class="notification is-warning">Please enter a valid number for car price quotes.</div>');
+                     surveyMessageArea.addClass('is-warning');
+                     submitSurveyButton.removeClass('is-loading');
+                     return;
+                }
+
+                const numDealersFinancingQuote = $('#numDealersFinancingQuote').val(); // Ensure these are correctly referenced if not already constants
+                if (numDealersFinancingQuote === '' || isNaN(numDealersFinancingQuote) || parseInt(numDealersFinancingQuote) < 0) {
+                     surveyMessageArea.html('<div class="notification is-warning">Please enter a valid number for financing quotes.</div>');
+                     surveyMessageArea.addClass('is-warning');
+                     submitSurveyButton.removeClass('is-loading');
+                     return;
+                }
+
+
+                // NEW: Validate that a stress scale button was actually clicked
+                if (stressScale === '0' || !stressScaleInteracted) {
+                    surveyMessageArea.html('<div class="notification is-warning">Please select a rating on the "Stress Scale" (1-10).</div>');
+                    surveyMessageArea.addClass('is-warning');
+                    submitSurveyButton.removeClass('is-loading');
+                    return;
+                }
+
+                // Ensure stressScale is a valid number within range after interaction
+                const parsedStressScale = parseInt(stressScale);
+                if (isNaN(parsedStressScale) || parsedStressScale < 1 || parsedStressScale > 10) {
+                     surveyMessageArea.html('<div class="notification is-warning">Please provide a valid stress scale rating (1-10).</div>');
+                     surveyMessageArea.addClass('is-warning');
+                     submitSurveyButton.removeClass('is-loading');
+                     return;
+                }
+
+
                 const surveyPayload = {
-                    submissionType: 'survey_submission', 
+                    submissionType: 'survey_submission',
                     emailAddress: emailAddressForSurvey,
                     dealSatisfaction: dealSatisfaction,
                     timeSpent: timeSpent,
-                    stressScale: stressScale,
-                    numDealersPriceQuote: numDealersPriceQuoteInput.val(),    
-                    numDealersFinancingQuote: numDealersFinancingQuoteInput.val() 
+                    stressScale: stressScale, // This now comes from the hidden input
+                    numDealersPriceQuote: numDealersPriceQuote,
+                    numDealersFinancingQuote: numDealersFinancingQuote
                 };
 
                 $.ajax({
