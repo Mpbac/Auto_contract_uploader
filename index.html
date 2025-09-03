@@ -368,50 +368,6 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-// Function to resize an image before upload
-function resizeImage(file, maxWidth, maxHeight, quality) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-            
-                // Set a maximum size for the image (e.g., 1024x1024)
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round(height * (maxWidth / width));
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round(width * (maxHeight / height));
-                        height = maxHeight;
-                    }
-                }
-            
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // Get the new image as a blob
-                canvas.toBlob((blob) => {
-                    const resizedFile = new File([blob], file.name, {
-                        type: blob.type,
-                        lastModified: Date.now()
-                    });
-                    resolve(resizedFile);
-                }, 'image/jpeg', quality); // Use a fixed quality for consistency
-            };
-        };
-        reader.onerror = (error) => reject(error);
-    });
-}
     <script>
         $(document).ready(function() {
             const uploadFormContainer = $('#uploadFormContainer');
