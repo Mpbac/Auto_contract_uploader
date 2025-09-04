@@ -498,100 +498,69 @@
 
 
             uploadForm.on('submit', function(event) {
-    event.preventDefault();
+                event.preventDefault();
 
-    const emailAddress = emailInput.val().trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const emailAddress = emailInput.val().trim();
 
-    // Validation remains the same
-    if (!emailAddress || !emailRegex.test(emailAddress)) {
-        messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
-        messageArea.addClass('is-warning');
-        emailInput.focus();
-        return;
-    }
-
-    if (filesToUpload.size === 0) {
-        messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
-        messageArea.addClass('is-warning');
-        contractFileInput.focus();
-        return;
-    }
-
-    submitButton.addClass('is-loading');
-    messageArea.html('<div class="notification is-info">Uploading file(s)... This may take a moment.</div>');
-    messageArea.addClass('is-info');
-
-    // Create a new FormData object
-    const formData = new FormData();
-    formData.append('submissionType', 'contract_upload');
-    formData.append('emailAddress', emailAddress);
-
-    // Append each file to the FormData object
-    filesToUpload.forEach((file) => {
-        formData.append('contractFiles[]', file, file.name);
-    });
-
-    // Use AJAX to send the FormData
-    $.ajax({
-        url: GOOGLE_SCRIPT_URL,
-        type: 'POST',
-        data: formData,
-        processData: false, // Prevents jQuery from processing the data
-        contentType: false, // Prevents jQuery from setting the Content-Type header
-        success: function(data) {
-            console.log('AJAX success response:', data);
-            if (data && data.status === 'success') {
-                messageArea.html('<div class="notification is-success">Successfully uploaded your files! Please answer a few questions below.</div>');
-                messageArea.addClass('is-success');
-                uploadFormContainer.hide();
-                questionsContainer.show();
-                emailInput.prop('disabled', true);
-                filesToUpload.clear();
-                renderSelectedFiles();
-            } else {
-                messageArea.html(`<div class="notification is-danger">Upload failed: ${data ? (data.message || 'Unknown error during upload.') : 'Invalid response from server.'}</div>`);
-                messageArea.addClass('is-danger');
-                console.error('Upload Error Response from server:', data);
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error('AJAX Error:', textStatus, errorThrown, jqXHR);
-            let errorMessage = 'Upload failed.';
-            
-            if (textStatus === 'timeout') {
-                errorMessage += ' The request timed out.';
-            } else if (jqXHR.status === 0) {
-                errorMessage += ' Network error or server did not respond.';
-            } else if (jqXHR.status === 404) {
-                errorMessage += ' Server not found. Check the script URL.';
-            } else if (jqXHR.status >= 500) {
-                errorMessage += ' Server error. Check the Apps Script execution logs.';
-            } else {
-                errorMessage += ` Status: ${jqXHR.status || 'N/A'}. Error: ${errorThrown || textStatus}`;
-            }
-
-            if (jqXHR.responseText) {
-                try {
-                    const responseJson = JSON.parse(jqXHR.responseText);
-                    if(responseJson.message) {
-                        errorMessage += ' Details: ' + responseJson.message;
-                    }
-                } catch (e) {
-                    const snippet = jqXHR.responseText.substring(0, 200);
-                    errorMessage += ' Raw server response snippet: ' + snippet + (jqXHR.responseText.length > 200 ? '...' : '');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailAddress || !emailRegex.test(emailAddress)) {
+                    messageArea.html('<div class="notification is-warning">Please enter a valid email address.</div>');
+                    messageArea.addClass('is-warning');
+                    emailInput.focus();
+                    return;
                 }
-            }
 
-            messageArea.html(`<div class="notification is-danger">${errorMessage} Please try again.</div>`);
-            messageArea.addClass('is-danger');
-        },
-        complete: function() {
-            console.log('AJAX complete.');
-            submitButton.removeClass('is-loading');
-        }
-    });
-});
+                if (filesToUpload.size === 0) {
+                    messageArea.html('<div class="notification is-warning">Please select one or more main contract files to upload.</div>');
+                    messageArea.addClass('is-warning');
+                    contractFileInput.focus();
+                    return;
+                }
+
+                submitButton.addClass('is-loading');
+                messageArea.html('<div class="notification is-info">Reading files and preparing for upload...</div>');
+                messageArea.addClass('is-info');
+
+                const postData = {
+                    submissionType: 'contract_upload', 
+                    emailAddress: emailAddress,
+                    files: [] 
+                };
+
+                const filesToRead = Array.from(filesToUpload.values());
+                let filesReadCount = 0;
+                const totalFilesToRead = filesToRead.length;
+
+                const readPromises = filesToRead.map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const base64Data = e.target.result.split(',')[1];
+                                const mimeType = file.type || 'application/octet-stream';
+                                const filename = file.name;
+
+                                postData.files.push({
+                                    data: base64Data,
+                                    mimetype: mimeType,
+                                    filename: filename
+                                });
+                                console.log(`Finished reading contract file: "${filename}"`);
+                                filesReadCount++;
+                                resolve();
+                            } catch (err) {
+                                console.error('FileReader processing error for file:', file.name, err);
+                                reject(`Error processing file "${file.name}": ${err.message}`);
+                            }
+                        };
+                        reader.onerror = function(err) {
+                            console.error('FileReader error for file:', file.name, err);
+                            reject(`Failed to read file "${file.name}".`);
+                        };
+                        console.log(`Starting FileReader for file: "${file.name}"`);
+                        reader.readAsDataURL(file);
+                    });
+                });
 
                 console.log('Starting Promise.all to read files...');
 
